@@ -8,8 +8,11 @@
 #include <qopenglbuffer.h>
 #include <qopengl.h>
 #include <qstring.h>
-#include <qfile.h>
-#include <qtextstream.h>
+#include <qdebug.h>
+// ASSIMP library for load object
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 class Model : public QOpenGLWidget, protected QOpenGLFunctions
 {
