@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PikachuClass</class>
+ <widget class="QMainWindow" name="PikachuClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1005</width>
+    <height>820</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Pikachu</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="RenderView" name="renderView">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>800</width>
+      <height>800</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>RenderView</class>
+   <extends>QOpenGLWidget</extends>
+   <header>renderview.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="Pikachu.qrc"/>
+ </resources>
+ <connections/>
+</ui>
