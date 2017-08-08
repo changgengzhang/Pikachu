@@ -19,5 +19,7 @@ bool Model::loadModelFromFile(QString fileName)
 		qDebug() << "ERROR::ASSIMP:: " << importer.GetErrorString();
 		return false;
 	}
-
+	// Most of the file formats don't really support complex scenes, but a single model only.
+	aiMesh *mesh = scene->mMeshes[0];
+	
 }

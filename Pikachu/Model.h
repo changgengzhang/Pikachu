@@ -27,6 +27,7 @@ private:
 	QString m_fileName;
 
 
+
 };
 
 #endif // !MODEL_H
