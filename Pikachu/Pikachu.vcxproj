@@ -99,6 +99,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Pikachu.cpp" />
     <ClCompile Include="RenderView.cpp" />
+    <ClCompile Include="SparseMatrix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Pikachu.h">
@@ -125,8 +126,10 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Exceptions.h" />
     <ClInclude Include="GeneratedFiles\ui_Pikachu.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="SparseMatrix.h" />
     <ClInclude Include="Util.h" />
     <CustomBuild Include="Model.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

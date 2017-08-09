@@ -22,6 +22,19 @@ bool Mesh::setupMeshByAimesh(aiMesh *mesh)
 	m_vertexCount = mesh->mNumVertices;
 	m_faceCount = mesh->mNumFaces;
 
+	m_vertexPos = new float(m_vertexCount * 3);
+	m_originalPos = new float(m_vertexCount * 3);
+	m_vertexNormal = new float(m_vertexCount * 3);
+
+	m_faceIndex = new uint(m_faceCount * 3);
+	m_faceNormal = new float(m_faceCount * 3);
+
+	m_flag = new uchar(m_vertexCount);
+	m_isBoundary = new bool(m_vertexCount);
+
+	m_color = new float(m_faceCount);
+
+
 	float x, y, z;
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
@@ -29,13 +42,14 @@ bool Mesh::setupMeshByAimesh(aiMesh *mesh)
 		y = mesh->mVertices[i].y;
 		z = mesh->mVertices[i].z;
 
-		m_vertexPos.append(x);
-		m_vertexPos.append(y);
-		m_vertexPos.append(z);
+		m_vertexPos[i * 3] = x;
+		m_vertexPos[i * 3 + 1] = y;
+		m_vertexPos[i * 3 + 2] = z;
 
-		m_originalPos.append(x);
-		m_originalPos.append(y);
-		m_originalPos.append(z);
+		m_originalPos[i * 3] = x;
+		m_originalPos[i * 3 + 1] = y;
+		m_originalPos[i * 3 + 2] = z;
+
 
 		m_maxCoord = zcg::maxBBOXCoord(m_maxCoord, glm::vec3(x, y, z));
 		m_minCoord = zcg::minBBOXCoord(m_minCoord, glm::vec3(x, y, z));
@@ -45,10 +59,9 @@ bool Mesh::setupMeshByAimesh(aiMesh *mesh)
 	{
 		aiFace face = mesh->mFaces[i];
 		// triangular face has 3 indices per face
-		for (uint j = 0; j < face.mNumIndices; i++)
-		{
-			m_faceIndex.append(face.mIndices[j]);
-		}
+		m_faceIndex[i * 3] = face.mIndices[0];
+		m_faceIndex[i * 3 + 1] = face.mIndices[1];
+		m_faceIndex[i * 3 + 2] = face.mIndices[2];
 	}
 	
 	scaleToUnitBox();
@@ -69,7 +82,7 @@ void Mesh::scaleToUnitBox()
 		return;
 	}
 
-	for (uint i = 0; i < m_vertexPos.count(); i++)
+	for (uint i = 0; i < m_vertexCount * 3; i++)
 	{
 		m_vertexPos[i] /= scale;
 	}

@@ -27,20 +27,19 @@ private:
 	void computeNormal();
 	inline glm::vec3 getOneVertex(uint pos);
 
-
 private:
 	int m_vertexCount;
 	int m_faceCount; 
-	QVector<float> m_vertexPos;
-	QVector<float> m_originalPos;
-	QVector<float> m_vertexNormal;
-	QVector<uint> m_faceIndex;
-	QVector<uint> m_dualFaceIndex;
-	QVector<float> m_faceNormal;
-	QVector<float> m_dualVertexPos;
-	QVector<unsigned char> m_flag;
-	QVector<bool> m_isBoundary;
-	QVector<float> m_color;
+	float *m_vertexPos;
+	float *m_originalPos;
+	float *m_vertexNormal;
+	uint *m_faceIndex;
+	uint *m_dualFaceIndex;
+	float *m_faceNormal;
+	float *m_dualVertexPos;
+	uchar *m_flag;
+	bool *m_isBoundary;
+	float *m_color;
 
 	glm::vec3 m_meshBarycenter;
 	glm::vec3 m_maxCoord;
