@@ -30,7 +30,7 @@ public:
     {
         if (PikachuClass->objectName().isEmpty())
             PikachuClass->setObjectName(QStringLiteral("PikachuClass"));
-        PikachuClass->resize(888, 820);
+        PikachuClass->resize(1005, 820);
         centralWidget = new QWidget(PikachuClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         renderView = new RenderView(centralWidget);

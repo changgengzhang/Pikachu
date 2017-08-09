@@ -2,9 +2,12 @@
 #define MESH_H
 
 #include <qvector.h>
-#include <qvector3d.h>
 
 #include <assimp/scene.h>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/matrix.hpp>
 
 #include "Util.h"
 
@@ -19,7 +22,11 @@ public:
 private:
 	void scaleToUnitBox();
 	void moveToCenter();
+	// void computeVertexNormal();
+	// void computeFaceNormal();
 	void computeNormal();
+	inline glm::vec3 getOneVertex(uint pos);
+
 
 private:
 	int m_vertexCount;
@@ -35,9 +42,9 @@ private:
 	QVector<bool> m_isBoundary;
 	QVector<float> m_color;
 
-	QVector3D m_meshBarycenter;
-	QVector3D m_maxCoord;
-	QVector3D m_minCoord;
+	glm::vec3 m_meshBarycenter;
+	glm::vec3 m_maxCoord;
+	glm::vec3 m_minCoord;
 
 };
 
