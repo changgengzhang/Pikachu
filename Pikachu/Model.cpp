@@ -3,6 +3,7 @@
 Model::Model(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
+	m_mesh = new Mesh();
 }
 
 Model::~Model()
@@ -22,4 +23,6 @@ bool Model::loadModelFromFile(QString fileName)
 	// Most of the file formats don't really support complex scenes, but a single model only.
 	aiMesh *mesh = scene->mMeshes[0];
 	
+	m_mesh->setupMeshByAimesh(mesh);
+	return true;
 }

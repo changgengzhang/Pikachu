@@ -14,6 +14,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "Mesh.h"
+
 class Model : public QOpenGLWidget, protected QOpenGLFunctions
 {
 	Q_OBJECT
@@ -26,7 +28,7 @@ public:
 private:
 	QString m_fileName;
 
-
+	Mesh* m_mesh;
 
 };
 

@@ -1,12 +1,12 @@
 #include "Mesh.h"
 
-
+// =========== construct and destruct =================
 Mesh::Mesh()
 {
 	m_vertexCount = 0;
 	m_faceCount = 0;
 
-	m_meshBarycenter = glm::vec3(0.0f);
+	m_meshCenter = glm::vec3(0.0f);
 	m_maxCoord = glm::vec3(std::numeric_limits<float>::min());
 	m_minCoord = glm::vec3(std::numeric_limits<float>::max());
 	
@@ -51,8 +51,8 @@ bool Mesh::setupMeshByAimesh(aiMesh *mesh)
 		m_originalPos[i * 3 + 2] = z;
 
 
-		m_maxCoord = zcg::maxBBOXCoord(m_maxCoord, glm::vec3(x, y, z));
-		m_minCoord = zcg::minBBOXCoord(m_minCoord, glm::vec3(x, y, z));
+		m_maxCoord = this->maxBBOXCoord(m_maxCoord, glm::vec3(x, y, z));
+		m_minCoord = this->minBBOXCoord(m_minCoord, glm::vec3(x, y, z));
 	}
 
 	for (uint i = 0; i < m_faceCount; i++)
@@ -64,12 +64,14 @@ bool Mesh::setupMeshByAimesh(aiMesh *mesh)
 		m_faceIndex[i * 3 + 2] = face.mIndices[2];
 	}
 	
-	scaleToUnitBox();
-	moveToCenter(); 
-	computeNormal();
+	this->scaleToUnitBox();
+	this->moveToCenter(); 
+	this->computeNormal();
+
 
 	return true;
 }
+
 
 void Mesh::scaleToUnitBox()
 {
@@ -88,9 +90,12 @@ void Mesh::scaleToUnitBox()
 	}
 }
 
+// this function only means that move the mesh to the center of a unit box.
+// do not take the center as the center of view coordinate
 void Mesh::moveToCenter()
 {
 	glm::vec3 center = (m_maxCoord + m_minCoord) / 2.0f;
+	m_meshCenter = center;
 
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
@@ -159,7 +164,43 @@ void Mesh::computeNormal()
 	delete[] vnormal;
 }
 
+// compute vertex-vertex adjacent matrix
+void Mesh::buildAdjacentVV()
+{
+	m_adjacentVV = new SparseMatrix<uint>(m_vertexCount);
+
+	int p0, p1, p2;
+	for (uint i = 0; i < m_faceCount; i++)
+	{
+		p0 = m_faceIndex[i * 3];
+		p1 = m_faceIndex[i * 3 + 1];
+		p2 = m_faceIndex[i * 3 + 2];
+
+
+	}
+}
+
+// ====================== tool function ================================
+
 glm::vec3 Mesh::getOneVertex(uint pos)
 {
 	return glm::vec3(m_vertexPos[pos * 3], m_vertexPos[pos * 3 + 1], m_vertexPos[pos * 3 + 2]);
+}
+
+inline glm::vec3 Mesh::maxBBOXCoord(glm::vec3 va, glm::vec3 vb)
+{
+	return glm::vec3(
+		va.x > vb.x ? va.x : vb.x,
+		va.y > vb.y ? va.y : vb.y,
+		va.z > vb.z ? va.z : vb.z
+	);
+}
+
+inline glm::vec3 Mesh::minBBOXCoord(glm::vec3 va, glm::vec3 vb)
+{
+	return glm::vec3(
+		va.x < vb.x ? va.x : vb.x,
+		va.y < vb.y ? va.y : vb.y,
+		va.z < vb.z ? va.z : vb.z
+	);
 }
