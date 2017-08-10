@@ -29,7 +29,7 @@ private:
 	void computeNormal();
 
 	void buildAdjacentVV();
-
+	void buildAdjacentVF();
 	
 	// ============ tools function ============
 	inline glm::vec3 maxBBOXCoord(glm::vec3 va, glm::vec3 vb);

@@ -176,7 +176,24 @@ void Mesh::buildAdjacentVV()
 		p1 = m_faceIndex[i * 3 + 1];
 		p2 = m_faceIndex[i * 3 + 2];
 
+		m_adjacentVV->set(1, p0, p1);
+		m_adjacentVV->set(1, p0, p2);
+		m_adjacentVV->set(1, p1, p0);
+		m_adjacentVV->set(1, p1, p2);
+		m_adjacentVV->set(1, p2, p0);
+		m_adjacentVV->set(1, p2, p1);
+	}
+}
 
+void Mesh::buildAdjacentVF()
+{
+	m_adjacentVF = new SparseMatrix<uint>(m_faceCount, m_vertexCount);
+
+	for (uint i = 0; i < m_faceCount; i++)
+	{
+		m_adjacentVF->set(1, i, m_faceIndex[i * 3]);
+		m_adjacentVF->set(1, i, m_faceIndex[i * 3 + 1]);
+		m_adjacentVF->set(1, i, m_faceIndex[i * 3 + 1]);
 	}
 }
 
