@@ -23,7 +23,7 @@ public:
 	int getNonzeroCount() const;
 
 	// ======== set get exist value =====================
-	T get(int row, int col) const;
+	uint get(int row, int col) const;
 	SparseMatrix<T>& set(T value, int row, int col);
 	bool isExist(int row, int col) const;
 
@@ -32,12 +32,10 @@ private:
 	void construct(int rows, int columns);
 	void copyData(const SparseMatrix<T> &m);
 	void destruct();
-	void initVector(QVector<T> &v, T value, uint size);
 
 	// ========== parameter valid check ============
 	void validateCoordinates(int row, int col) const;
 	
-
 private:
 	// ========== values ==========================
 	int m_numRows;
@@ -49,6 +47,8 @@ private:
 	QVector<int> m_rowPtr;
 
 };
+
+
 
 
 #endif // !SPARSE_MATRIX_H

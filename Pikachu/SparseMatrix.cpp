@@ -13,9 +13,10 @@ SparseMatrix<T>::SparseMatrix(int rows, int columns)
 }
 
 template<typename T>
-SparseMatrix<T>::SparseMatrix(const SparseMatrix<T> & m)
+SparseMatrix<T>::SparseMatrix(const SparseMatrix & m)
 {
 	this->copyData(m);
+	
 }
 
 template<typename T>
@@ -24,7 +25,7 @@ SparseMatrix<T>& SparseMatrix<T>::operator = (const SparseMatrix<T> & m)
 	if (&m != this)
 	{
 		this->destruct();
-		this->copyData();
+		this->copyData(m);
 	}
 	return *this;
 }
@@ -32,9 +33,7 @@ SparseMatrix<T>& SparseMatrix<T>::operator = (const SparseMatrix<T> & m)
 template<typename T>
 SparseMatrix<T>::~SparseMatrix()
 {
-	m_value.freeData();
-	m_colIndex.freeData();
-	m_rowPtr.freeData();
+	this->destruct();
 }
 
 // ================== priavte values get ===============
@@ -59,7 +58,7 @@ int SparseMatrix<T>::getNonzeroCount() const
 // =================== set get exist value ==============
 
 template<typename T>
-T SparseMatrix<T>::get(int row, int col) const
+uint SparseMatrix<T>::get(int row, int col) const
 {
 	this->validateCoordinates(row, col);
 
@@ -79,7 +78,7 @@ T SparseMatrix<T>::get(int row, int col) const
 			break;
 		}
 	}
-	return T();
+	return 0;
 }
 
 template<typename T>
@@ -101,11 +100,11 @@ SparseMatrix<T>& SparseMatrix<T>::set(T value, int row, int col)
 
 	if (currCol == col)
 	{
-		if (value == T())
+		if (value == 0)
 		{
 			// remove this value
 			m_value.erase(m_value.begin() + pos);
-			m_colIndex.erase(m_value.begin() + pos);
+			m_colIndex.erase(m_colIndex.begin() + pos);
 			// update row ptr
 			for (int i = row; i <= m_numRows; i++)
 			{
@@ -171,39 +170,28 @@ void SparseMatrix<T>::construct(int rows, int columns)
 	m_numCols = columns;
 	m_numNonzero = 0;
 
-	this->initVector(m_rowPtr, 0, m_numRows + 1);
+	for (int i = 0; i < m_numRows + 1; i++)
+	{
+		m_rowPtr.append(0);
+	}
 }
 
-
 template<typename T>
-void SparseMatrix<T>::copyData(const SparseMatrix<T> &m)
+void SparseMatrix<T>::copyData(const SparseMatrix &m)
 {
 	m_numRows = m.m_numRows;
 	m_numCols = m.m_numCols;
 	m_numNonzero = m.m_numNonzero;
 
 	m_value = m.m_value;
-	m_colIndex = m.m_value;
+	m_colIndex = m.m_colIndex;
 	m_rowPtr = m.m_rowPtr;
 }
 
 template<typename T>
 void SparseMatrix<T>::destruct()
 {
-	m_value.freeData();
-	m_colIndex.freeData();
-	m_rowPtr.freeData();
-
-}
-
-template<typename T>
-void SparseMatrix<T>::initVector(QVector<T> &v, T value, uint size)
-{
-	v.clear();
-	for (uint i = 0; i < size; i++)
-	{
-		v.append(value);
-	}
+	
 }
 
 template<typename T>
@@ -213,3 +201,7 @@ void SparseMatrix<T>::validateCoordinates(int row, int col) const
 		throw InvalidCoordinatesException("Coordinates out of range.");
 	}
 }
+
+
+// ==================== explicit instantiations  ===========================
+template class SparseMatrix<uint>;
