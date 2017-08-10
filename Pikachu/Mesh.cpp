@@ -197,6 +197,13 @@ void Mesh::buildAdjacentVF()
 	}
 }
 
+void Mesh::buildAdjacentFF()
+{
+	m_adjacentFF = new SparseMatrix<uint>(m_faceCount);
+
+
+}
+
 // ====================== tool function ================================
 
 glm::vec3 Mesh::getOneVertex(uint pos)

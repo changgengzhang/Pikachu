@@ -30,7 +30,8 @@ private:
 
 	void buildAdjacentVV();
 	void buildAdjacentVF();
-	
+	void buildAdjacentFF();
+
 	// ============ tools function ============
 	inline glm::vec3 maxBBOXCoord(glm::vec3 va, glm::vec3 vb);
 	inline glm::vec3 minBBOXCoord(glm::vec3 va, glm::vec3 vb);
