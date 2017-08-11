@@ -1,4 +1,9 @@
 #include "Mesh.h"
+/************************************************************************/
+/*			the vertex index is start from one, not zero				*/
+/*		 so we decide the face index is also start from one				*/
+/************************************************************************/
+
 
 // =========== construct and destruct =================
 Mesh::Mesh()
@@ -10,6 +15,9 @@ Mesh::Mesh()
 	m_maxCoord = glm::vec3(std::numeric_limits<float>::min());
 	m_minCoord = glm::vec3(std::numeric_limits<float>::max());
 	
+	m_adjacentVV = nullptr;
+	m_adjacentVF = nullptr;
+	m_adjacentFF = nullptr;
 }
 
 Mesh::~Mesh()
@@ -28,6 +36,7 @@ bool Mesh::setupMeshByAimesh(aiMesh *mesh)
 
 	m_faceIndex = new uint(m_faceCount * 3);
 	m_faceNormal = new float(m_faceCount * 3);
+	m_dualVertexPos = new float(m_faceCount * 3);
 
 	m_flag = new uchar(m_vertexCount);
 	m_isBoundary = new bool(m_vertexCount);
@@ -67,7 +76,9 @@ bool Mesh::setupMeshByAimesh(aiMesh *mesh)
 	this->scaleToUnitBox();
 	this->moveToCenter(); 
 	this->computeNormal();
-
+	this->buildAdjacentVV();
+	this->buildAdjacentVF();
+	this->buildAdjacentFF();
 
 	return true;
 }
@@ -187,31 +198,73 @@ void Mesh::buildAdjacentVV()
 
 void Mesh::buildAdjacentVF()
 {
-	m_adjacentVF = new SparseMatrix<uint>(m_faceCount, m_vertexCount);
+	m_adjacentVF = new SparseMatrix<uint>(m_vertexCount, m_faceCount);
 
 	for (uint i = 0; i < m_faceCount; i++)
 	{
-		m_adjacentVF->set(1, i, m_faceIndex[i * 3]);
-		m_adjacentVF->set(1, i, m_faceIndex[i * 3 + 1]);
-		m_adjacentVF->set(1, i, m_faceIndex[i * 3 + 1]);
+		// the face index start form one for consistent  with vertex index
+		m_adjacentVF->set(1, m_faceIndex[i * 3], i + 1);
+		m_adjacentVF->set(1, m_faceIndex[i * 3 + 1], i + 1);
+		m_adjacentVF->set(1, m_faceIndex[i * 3 + 1], i + 1);
 	}
 }
 
+// must build vertex-face matrix before call the function
 void Mesh::buildAdjacentFF()
 {
 	m_adjacentFF = new SparseMatrix<uint>(m_faceCount);
+	int v0, v1, v2;
+	uint faceIndex;
+	QVector<uint> oneRow;
 
+	for (uint i = 0; i < m_faceCount; i++)
+	{
+		v0 = m_faceIndex[3 * i];
+		v1 = m_faceIndex[3 * i + 1];
+		v2 = m_faceIndex[3 * i + 2];
 
+		oneRow = m_adjacentVF->getRow(v0);
+		for (uint j = 0; j < oneRow.count(); j++)
+		{
+			faceIndex = oneRow.at(j);
+			// must share one edge if two face is adjacent.
+			if (faceIndex != (i + 1) && isFaceContainVertex(faceIndex, v1))
+			{
+				// assume face index is start from one
+				m_adjacentFF->set(1, i + 1, faceIndex);
+			}
+		}
+
+		oneRow = m_adjacentVF->getRow(v1);
+		for (uint j = 0; j < oneRow.count(); j++)
+		{
+			faceIndex = oneRow.at(j);
+			if (faceIndex != (i + 1) && isFaceContainVertex(faceIndex, v2))
+			{
+				m_adjacentFF->set(1, i + 1, faceIndex);
+			}
+		}
+
+		oneRow = m_adjacentVF->getRow(v2);
+		for (uint j = 0; j < oneRow.count(); j++)
+		{
+			faceIndex = oneRow.at(j);
+			if (faceIndex != (i + 1) && isFaceContainVertex(faceIndex, v1))
+			{
+				m_adjacentFF->set(1, i + 1, faceIndex);
+			}
+		}
+	}
 }
 
 // ====================== tool function ================================
 
-glm::vec3 Mesh::getOneVertex(uint pos)
+glm::vec3 Mesh::getOneVertex(uint index) const
 {
-	return glm::vec3(m_vertexPos[pos * 3], m_vertexPos[pos * 3 + 1], m_vertexPos[pos * 3 + 2]);
+	return glm::vec3(m_vertexPos[index * 3], m_vertexPos[index * 3 + 1], m_vertexPos[index * 3 + 2]);
 }
 
-inline glm::vec3 Mesh::maxBBOXCoord(glm::vec3 va, glm::vec3 vb)
+inline glm::vec3 Mesh::maxBBOXCoord(glm::vec3 va, glm::vec3 vb) const
 {
 	return glm::vec3(
 		va.x > vb.x ? va.x : vb.x,
@@ -220,11 +273,59 @@ inline glm::vec3 Mesh::maxBBOXCoord(glm::vec3 va, glm::vec3 vb)
 	);
 }
 
-inline glm::vec3 Mesh::minBBOXCoord(glm::vec3 va, glm::vec3 vb)
+inline glm::vec3 Mesh::minBBOXCoord(glm::vec3 va, glm::vec3 vb) const
 {
 	return glm::vec3(
 		va.x < vb.x ? va.x : vb.x,
 		va.y < vb.y ? va.y : vb.y,
 		va.z < vb.z ? va.z : vb.z
 	);
+}
+
+// we assume that face index is start from one
+bool Mesh::isFaceContainVertex(uint fIndex, uint vIndex) const
+{
+	int v0, v1, v2;
+	v0 = m_faceIndex[(fIndex - 1) * 3];
+	v1 = m_faceIndex[(fIndex - 1) * 3 + 1];
+	v2 = m_faceIndex[(fIndex - 1) * 3 + 1];
+
+	return (v0 == vIndex) || (v1 == vIndex) || (v2 == vIndex);
+}
+
+
+// ========= get value ===================
+const int Mesh::getVertexCount() const
+{
+	return m_vertexCount;
+}
+
+
+const int Mesh::getFaceCount() const
+{
+	return m_faceCount;
+}
+
+
+const float* Mesh::getVertexPos() const
+{
+	return m_vertexPos;
+}
+
+
+const float* Mesh::getOriginalPos() const
+{
+	return m_originalPos;
+}
+
+
+const float* Mesh::getVertexNormal() const
+{
+	return m_vertexNormal;
+}
+
+
+const float* Mesh::getFaceNormal() const
+{
+	return m_faceNormal;
 }

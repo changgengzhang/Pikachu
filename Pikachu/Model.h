@@ -13,22 +13,59 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+// glm 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Mesh.h"
+#include "Util.h"
 
 class Model : public QOpenGLWidget, protected QOpenGLFunctions
 {
 	Q_OBJECT
 
 public:
-	Model(QWidget *parent);
+	
+	Model(QWidget *parent=0);
 	~Model();
-	bool loadModelFromFile(QString fileName);
+
+	// ========= OpenGL context build function =============
+	bool loadMeshFromFile(QString fileName);
+	void buildShaderProgram(QString vertexFile, QString fragmentFile);
+	void buildVAOAndVBO();
+	void draw();
+
+	// ========= set uniform value ===========
+	void setModelMatValue(glm::mat4 modelMat);
+	void setViewMatValue(glm::mat4 viewMat);
+	void setProjMatValue(glm::mat4 projMat);
 
 private:
+	// ========= tools functions ============	
+	void getUniformLoc();
+	void setUniformValue();
+
+private:
+	// ========== menber value ==============
+	Mesh* m_mesh;
 	QString m_fileName;
 
-	Mesh* m_mesh;
+	zcg::MeshDisplayWay m_displayWay;
+
+	// ========  shader ===============
+	QOpenGLShaderProgram *m_shaderProgram;
+	QOpenGLVertexArrayObject m_vao;
+	QOpenGLBuffer m_vbo;
+	
+	// ========== MVP matrix ==========
+	glm::mat4 m_modelMat;
+	glm::mat4 m_viewMat;
+	glm::mat4 m_projMat;
+
+	// ======== shader uniform value location =========
+	GLuint m_modelMatLoc;
+	GLuint m_viewMatLoc;
+	GLuint m_projMatLoc;
 
 };
 

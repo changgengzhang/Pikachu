@@ -18,14 +18,17 @@ public:
 	SparseMatrix<T>& operator = (const SparseMatrix<T> & m);
 	
 	// ========= priavte values get ==============
-	int getRowCount() const;
-	int getColCount() const;
+	int getNumRow() const;
+	int getNumCol() const;
 	int getNonzeroCount() const;
 
 	// ======== set get exist value =====================
 	uint get(int row, int col) const;
 	SparseMatrix<T>& set(T value, int row, int col);
 	bool isExist(int row, int col) const;
+
+	QVector<T> getRow(int row);
+	uint getRowElemNum(int row);
 
 private:
 	// ========== assistant function  ===============

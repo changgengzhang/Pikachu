@@ -38,13 +38,13 @@ SparseMatrix<T>::~SparseMatrix()
 
 // ================== priavte values get ===============
 template<typename T>
-int SparseMatrix<T>::getRowCount() const
+int SparseMatrix<T>::getNumRow() const
 {
 	return m_numRows;
 }
 
 template<typename T>
-int SparseMatrix<T>::getColCount() const
+int SparseMatrix<T>::getNumCol() const
 {
 	return m_numCols;
 }
@@ -155,6 +155,30 @@ bool SparseMatrix<T>::isExist(int row, int col) const
 	return false;
 }
 
+
+template<typename T>
+QVector<T> SparseMatrix<T>::getRow(int row)
+{
+	this->validateCoordinates(row, m_numCols);
+
+	QVector<T> rowValue;
+	T value;
+	int pos = m_rowPtr.at(row - 1);
+
+	for (; pos < m_rowPtr.at(row); pos++)
+	{
+		value = m_value.at(pos);
+		rowValue.append(value);
+	}
+	return rowValue;
+}
+
+
+template<typename T>
+uint SparseMatrix<T>::getRowElemNum(int row)
+{
+	return this->getRow(row).count();
+}
 
 // ===================  assistant function ==============
 

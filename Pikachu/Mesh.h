@@ -21,9 +21,17 @@ public:
 
 	// ========== interactive with outer =================
 	bool setupMeshByAimesh(aiMesh *mesh);
+	
+	// ========= get value ===================
+	const int getVertexCount() const;
+	const int getFaceCount() const;
+	const float* getVertexPos() const;
+	const float* getOriginalPos() const;
+	const float* getVertexNormal() const;
+	const float* getFaceNormal() const;
 
 private:
-	// ========== operation to vertex ==========
+	// ========== operation to vertex function ==========
 	void scaleToUnitBox();
 	void moveToCenter();
 	void computeNormal();
@@ -33,11 +41,12 @@ private:
 	void buildAdjacentFF();
 
 	// ============ tools function ============
-	inline glm::vec3 maxBBOXCoord(glm::vec3 va, glm::vec3 vb);
-	inline glm::vec3 minBBOXCoord(glm::vec3 va, glm::vec3 vb);
-	inline glm::vec3 getOneVertex(uint pos);
+	inline glm::vec3 maxBBOXCoord(glm::vec3 va, glm::vec3 vb) const;
+	inline glm::vec3 minBBOXCoord(glm::vec3 va, glm::vec3 vb) const;
+	inline glm::vec3 getOneVertex(uint index) const;
+	bool isFaceContainVertex(uint fIndex, uint vIndex) const;
 
-private:
+
 	// ============ values for mesh ==============
 	int m_vertexCount;
 	int m_faceCount; 
@@ -57,7 +66,7 @@ private:
 	glm::vec3 m_maxCoord;
 	glm::vec3 m_minCoord;
 
-	// ============ sparse matrix for vertex-vertex =============
+	// ============ sparse matrix for vertex-vertex vertex-face face-face =============
 	SparseMatrix<uint>* m_adjacentVV;
 	SparseMatrix<uint>* m_adjacentVF;
 	SparseMatrix<uint>* m_adjacentFF;

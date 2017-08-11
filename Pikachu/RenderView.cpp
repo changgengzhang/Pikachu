@@ -3,6 +3,7 @@
 RenderView::RenderView(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
+	m_model = new Model();
 }
 
 RenderView::~RenderView()
@@ -17,6 +18,9 @@ void RenderView::initializeGL()
 	glViewport(0, 0, m_scrWidth, m_scrWidth);
 	glClearColor(1.0f, 1.0f, 1.0f, 1);
 
+	m_model->loadMeshFromFile("./sphere.ply");
+	m_model->buildShaderProgram("./shader/modelShader.vert", "./shader/modelShader.frag");
+	m_model->buildVAOAndVBO();
 }
 
 /*
@@ -27,7 +31,7 @@ you should call the widget's update() function to schedule an update.
 void RenderView::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	m_model->draw();
 }
 
 /*

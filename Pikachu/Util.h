@@ -5,6 +5,12 @@
 #include <glm/glm.hpp>
 
 namespace zcg {
+	enum MeshDisplayWay
+	{
+		FILL,
+		LINE,
+		POINT,
+	};
 
 	inline glm::vec3 maxBBOXCoord(glm::vec3 va, glm::vec3 vb)
 	{
@@ -23,6 +29,7 @@ namespace zcg {
 			va.z < vb.z ? va.z : vb.z
 		);
 	}
+
 
 }
 

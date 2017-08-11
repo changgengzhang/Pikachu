@@ -9,9 +9,7 @@
 #include <qopengl.h>
 #include <qevent.h>
 
-namespace zcg {
-	class RenderView;
-}
+#include "Model.h"
 
 class RenderView : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -22,6 +20,7 @@ public:
 	~RenderView();
 
 protected:
+	// ============== virtual function inherited form QOpenGLWidget ================
 	void initializeGL() override;
 	void paintGL() override;
 	void resizeGL(int width, int height) override;
@@ -33,13 +32,16 @@ protected:
 private slots:
 	void cleanup();
 
-
 private:
+	// ========= viewport ============
 	float m_scrWidth;
 	float m_scrHeight;
+	// ========= MVP matrix ==========
+	glm::mat4 m_modelMat;
+	glm::mat4 m_viewMat;
+	glm::mat4 m_projMat;
 
-
-
+	Model *m_model;
 };
 
 
