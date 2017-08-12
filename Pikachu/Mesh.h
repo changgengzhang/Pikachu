@@ -2,6 +2,11 @@
 #define MESH_H
 // Qt
 #include <qvector.h>
+#include <qdebug.h>
+#include <qstring.h>
+#include <qfile.h>
+#include <qtextstream.h>
+#include <qregexp.h>
 
 // Assimp
 #include <assimp/scene.h>
@@ -12,30 +17,39 @@
 
 #include "SparseMatrix.h"
 
+
 class Mesh
 {
 public:
+	
 	// =========== construct and destruct =================
 	Mesh();
 	~Mesh();
 
 	// ========== interactive with outer =================
 	bool setupMeshByAimesh(aiMesh *mesh);
+	bool buildMesh(QString fileName);
 	
 	// ========= get value ===================
 	const int getVertexCount() const;
 	const int getFaceCount() const;
 	const float* getVertexPos() const;
 	const float* getOriginalPos() const;
+	const uint* getFaceIndex() const;
 	const float* getVertexNormal() const;
 	const float* getFaceNormal() const;
 
 private:
+	// ======== prase molde file to mesh ============
+	bool parseFromObjFile(QString fileName);
+
+	// ========= malloc memory for mesh ==============
+	void initMeshValue(QVector<float> &vlist, QVector<uint> &flist);
+
 	// ========== operation to vertex function ==========
 	void scaleToUnitBox();
 	void moveToCenter();
 	void computeNormal();
-
 	void buildAdjacentVV();
 	void buildAdjacentVF();
 	void buildAdjacentFF();
@@ -45,7 +59,6 @@ private:
 	inline glm::vec3 minBBOXCoord(glm::vec3 va, glm::vec3 vb) const;
 	inline glm::vec3 getOneVertex(uint index) const;
 	bool isFaceContainVertex(uint fIndex, uint vIndex) const;
-
 
 	// ============ values for mesh ==============
 	int m_vertexCount;
@@ -70,6 +83,8 @@ private:
 	SparseMatrix<uint>* m_adjacentVV;
 	SparseMatrix<uint>* m_adjacentVF;
 	SparseMatrix<uint>* m_adjacentFF;
+
+	
 };
 
 #endif // !MESH_H

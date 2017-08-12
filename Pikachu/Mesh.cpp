@@ -1,7 +1,6 @@
 #include "Mesh.h"
 /************************************************************************/
-/*			the vertex index is start from one, not zero				*/
-/*		 so we decide the face index is also start from one				*/
+/*		Assimp has uniform the layout that vertex index start from zero	*/
 /************************************************************************/
 
 
@@ -22,34 +21,104 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
+	delete[] m_vertexPos;
+	delete[] m_originalPos;
+	delete[] m_vertexNormal;
 
+	delete[] m_faceIndex;
+	delete[] m_faceNormal;
+	delete[] m_dualVertexPos;
+
+	delete[] m_flag;
+	delete[] m_isBoundary;
+
+	delete[] m_color;
 }
 
-bool Mesh::setupMeshByAimesh(aiMesh *mesh)
+
+// 20170812  only obj format
+bool Mesh::buildMesh(QString fileName)
 {
-	m_vertexCount = mesh->mNumVertices;
-	m_faceCount = mesh->mNumFaces;
+	// only support .obj
+	QString type = fileName.split(".").last();
+	if (type == "obj")
+	{
+		this->parseFromObjFile(fileName);
+		return true;
+	}
+	else if (type == "ply")
+	{
+		return false;
+	}
+	return false;
+}
 
-	m_vertexPos = new float(m_vertexCount * 3);
-	m_originalPos = new float(m_vertexCount * 3);
-	m_vertexNormal = new float(m_vertexCount * 3);
 
-	m_faceIndex = new uint(m_faceCount * 3);
-	m_faceNormal = new float(m_faceCount * 3);
-	m_dualVertexPos = new float(m_faceCount * 3);
+// ======== prase molde file to mesh ============
+bool Mesh::parseFromObjFile(QString fileName)
+{
+	QFile file(fileName);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		return false;
+	}
+	QTextStream stream(&file);
 
-	m_flag = new uchar(m_vertexCount);
-	m_isBoundary = new bool(m_vertexCount);
+	QString line;
+	QStringList tokens, tokens2;
+	QVector<float> vlist;
+	QVector<uint> flist;
+	while (stream.readLineInto(&line))
+	{
+		tokens = line.split(QRegExp("\\s"));
+		if (tokens.first().toLower() == "v")
+		{
+			vlist.append(tokens.at(1).toFloat());
+			vlist.append(tokens.at(2).toFloat());
+			vlist.append(tokens.at(3).toFloat());
+		}
+		else if (tokens.first().toLower() == "f")
+		{
+			for (int i = 1; i < tokens.count(); i++)
+			{
+				tokens2 = tokens.at(i).split("/");
+				// the face index of obj format file is start from one, however in OpenGL the index musr strt form zero
+				// while use glDrawElements
+				flist.append(tokens2.at(0).toUInt() - 1);
+			}
+		}
+	}
 
-	m_color = new float(m_faceCount);
+	this->initMeshValue(vlist, flist);
+	return true;
+}
 
+
+// ========= malloc memory for mesh ==============
+void Mesh::initMeshValue(QVector<float> &vlist, QVector<uint> &flist)
+{
+	m_vertexCount = vlist.count() / 3;
+	m_faceCount = flist.count() / 3;
+
+	m_vertexPos = new float[m_vertexCount * 3];
+	m_originalPos = new float[m_vertexCount * 3];
+	m_vertexNormal = new float[m_vertexCount * 3];
+
+	m_faceIndex = new uint[m_faceCount * 3];
+	m_faceNormal = new float[m_faceCount * 3];
+	m_dualVertexPos = new float[m_faceCount * 3];
+
+	m_flag = new uchar[m_vertexCount];
+	m_isBoundary = new bool[m_vertexCount];
+
+	m_color = new float[m_faceCount];
 
 	float x, y, z;
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
-		x = mesh->mVertices[i].x;
-		y = mesh->mVertices[i].y;
-		z = mesh->mVertices[i].z;
+		x = vlist[i * 3];
+		y = vlist[i * 3 + 1];
+		z = vlist[i * 3 + 2];
 
 		m_vertexPos[i * 3] = x;
 		m_vertexPos[i * 3 + 1] = y;
@@ -59,28 +128,26 @@ bool Mesh::setupMeshByAimesh(aiMesh *mesh)
 		m_originalPos[i * 3 + 1] = y;
 		m_originalPos[i * 3 + 2] = z;
 
-
 		m_maxCoord = this->maxBBOXCoord(m_maxCoord, glm::vec3(x, y, z));
 		m_minCoord = this->minBBOXCoord(m_minCoord, glm::vec3(x, y, z));
 	}
 
 	for (uint i = 0; i < m_faceCount; i++)
 	{
-		aiFace face = mesh->mFaces[i];
 		// triangular face has 3 indices per face
-		m_faceIndex[i * 3] = face.mIndices[0];
-		m_faceIndex[i * 3 + 1] = face.mIndices[1];
-		m_faceIndex[i * 3 + 2] = face.mIndices[2];
-	}
-	
-	this->scaleToUnitBox();
-	this->moveToCenter(); 
-	this->computeNormal();
-	this->buildAdjacentVV();
-	this->buildAdjacentVF();
-	this->buildAdjacentFF();
+		// o
+		m_faceIndex[i * 3] = flist[i * 3];
+		m_faceIndex[i * 3 + 1] = flist[i * 3 + 1];
+		m_faceIndex[i * 3 + 2] = flist[i * 3 + 2];
 
-	return true;
+	}
+
+	this->scaleToUnitBox();
+	this->moveToCenter();
+	this->computeNormal();
+	//this->buildAdjacentVV();
+	//this->buildAdjacentVF();
+	//this->buildAdjacentFF();
 }
 
 
@@ -154,9 +221,9 @@ void Mesh::computeNormal()
 		faceNormal = glm::cross(v01, v02);
 		
 		// vertex normal is average of face normal which belongs to
-		vnormal[v0] = vnormal[v0] + faceNormal * (1.0f / (lenV01 + lenV02));
-		vnormal[v1] = vnormal[v1] + faceNormal * (1.0f / (lenV01 + lenV12));
-		vnormal[v2] = vnormal[v2] + faceNormal * (1.0f / (lenV02 + lenV12));
+		vnormal[v0] += faceNormal * (1.0f / (lenV01 + lenV02));
+		vnormal[v1] += faceNormal * (1.0f / (lenV01 + lenV12));
+		vnormal[v2] += faceNormal * (1.0f / (lenV02 + lenV12));
 
 		faceNormal = glm::normalize(faceNormal);
 		m_faceNormal[i * 3] = faceNormal.x;
@@ -193,7 +260,10 @@ void Mesh::buildAdjacentVV()
 		m_adjacentVV->set(1, p1, p2);
 		m_adjacentVV->set(1, p2, p0);
 		m_adjacentVV->set(1, p2, p1);
+
+		qDebug() << "i = " << i;
 	}
+	qDebug() << "MESH::buildAdjacentVV::Done";
 }
 
 void Mesh::buildAdjacentVF()
@@ -202,10 +272,10 @@ void Mesh::buildAdjacentVF()
 
 	for (uint i = 0; i < m_faceCount; i++)
 	{
-		// the face index start form one for consistent  with vertex index
-		m_adjacentVF->set(1, m_faceIndex[i * 3], i + 1);
-		m_adjacentVF->set(1, m_faceIndex[i * 3 + 1], i + 1);
-		m_adjacentVF->set(1, m_faceIndex[i * 3 + 1], i + 1);
+		// the face index start form zero
+		m_adjacentVF->set(1, m_faceIndex[i * 3], i);
+		m_adjacentVF->set(1, m_faceIndex[i * 3 + 1], i);
+		m_adjacentVF->set(1, m_faceIndex[i * 3 + 1], i);
 	}
 }
 
@@ -228,10 +298,10 @@ void Mesh::buildAdjacentFF()
 		{
 			faceIndex = oneRow.at(j);
 			// must share one edge if two face is adjacent.
-			if (faceIndex != (i + 1) && isFaceContainVertex(faceIndex, v1))
+			if (faceIndex != i && isFaceContainVertex(faceIndex, v1))
 			{
-				// assume face index is start from one
-				m_adjacentFF->set(1, i + 1, faceIndex);
+				// assume face index is start from zero
+				m_adjacentFF->set(1, i, faceIndex);
 			}
 		}
 
@@ -239,9 +309,9 @@ void Mesh::buildAdjacentFF()
 		for (uint j = 0; j < oneRow.count(); j++)
 		{
 			faceIndex = oneRow.at(j);
-			if (faceIndex != (i + 1) && isFaceContainVertex(faceIndex, v2))
+			if (faceIndex != i && isFaceContainVertex(faceIndex, v2))
 			{
-				m_adjacentFF->set(1, i + 1, faceIndex);
+				m_adjacentFF->set(1, i, faceIndex);
 			}
 		}
 
@@ -249,9 +319,9 @@ void Mesh::buildAdjacentFF()
 		for (uint j = 0; j < oneRow.count(); j++)
 		{
 			faceIndex = oneRow.at(j);
-			if (faceIndex != (i + 1) && isFaceContainVertex(faceIndex, v1))
+			if (faceIndex != i && isFaceContainVertex(faceIndex, v1))
 			{
-				m_adjacentFF->set(1, i + 1, faceIndex);
+				m_adjacentFF->set(1, i, faceIndex);
 			}
 		}
 	}
@@ -288,7 +358,7 @@ bool Mesh::isFaceContainVertex(uint fIndex, uint vIndex) const
 	int v0, v1, v2;
 	v0 = m_faceIndex[(fIndex - 1) * 3];
 	v1 = m_faceIndex[(fIndex - 1) * 3 + 1];
-	v2 = m_faceIndex[(fIndex - 1) * 3 + 1];
+	v2 = m_faceIndex[(fIndex - 1) * 3 + 2];
 
 	return (v0 == vIndex) || (v1 == vIndex) || (v2 == vIndex);
 }
@@ -318,6 +388,11 @@ const float* Mesh::getOriginalPos() const
 	return m_originalPos;
 }
 
+
+const uint* Mesh::getFaceIndex() const
+{
+	return m_faceIndex;
+}
 
 const float* Mesh::getVertexNormal() const
 {

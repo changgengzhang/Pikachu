@@ -30,6 +30,15 @@ namespace zcg {
 		);
 	}
 
+	template<typename T> void printArray(const T *array, uint size)
+	{
+		for (uint i = 0; i < size; i++)
+		{
+			qDebug() << array[i];
+		}
+	}
+
+	template<uint> void printArray(const uint *array, uint size);
 
 }
 

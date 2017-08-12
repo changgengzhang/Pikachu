@@ -62,10 +62,10 @@ uint SparseMatrix<T>::get(int row, int col) const
 {
 	this->validateCoordinates(row, col);
 
-	int currCol = 0;
-	int pos = m_rowPtr.at(row - 1);
+	int currCol = -1;
+	int pos = m_rowPtr.at(row);
 
-	for (; pos < m_rowPtr.at(row); pos++)
+	for (; pos < m_rowPtr.at(row + 1); pos++)
 	{
 		currCol = m_colIndex.at(pos);
 
@@ -86,10 +86,10 @@ SparseMatrix<T>& SparseMatrix<T>::set(T value, int row, int col)
 {
 	this->validateCoordinates(row, col);
 
-	int currCol = 0;
-	int pos = m_rowPtr.at(row - 1);
+	int currCol = -1;
+	int pos = m_rowPtr.at(row);
 
-	for (; pos < m_rowPtr.at(row); pos++)
+	for (; pos < m_rowPtr.at(row + 1); pos++)
 	{
 		currCol = m_colIndex.at(pos);
 		if (currCol >= col)
@@ -106,7 +106,7 @@ SparseMatrix<T>& SparseMatrix<T>::set(T value, int row, int col)
 			m_value.erase(m_value.begin() + pos);
 			m_colIndex.erase(m_colIndex.begin() + pos);
 			// update row ptr
-			for (int i = row; i <= m_numRows; i++)
+			for (int i = row; i < m_numRows; i++)
 			{
 				m_rowPtr[i] -= 1;
 			}
@@ -123,7 +123,7 @@ SparseMatrix<T>& SparseMatrix<T>::set(T value, int row, int col)
 		m_colIndex.insert(m_colIndex.begin() + pos, col);
 
 		// update row ptr
-		for (int i = row; i <= m_numRows; i++)
+		for (int i = row; i < m_numRows; i++)
 		{
 			m_rowPtr[i] += 1;
 		}
@@ -136,10 +136,10 @@ bool SparseMatrix<T>::isExist(int row, int col) const
 {
 	this->validateCoordinates(row, col);
 
-	int currCol = 0;
-	int pos = m_rowPtr.at(row - 1);
+	int currCol = -1;
+	int pos = m_rowPtr.at(row);
 
-	for (; pos < m_rowPtr.at(row); pos++)
+	for (; pos < m_rowPtr.at(row + 1); pos++)
 	{
 		currCol = m_colIndex.at(pos);
 
@@ -163,9 +163,9 @@ QVector<T> SparseMatrix<T>::getRow(int row)
 
 	QVector<T> rowValue;
 	T value;
-	int pos = m_rowPtr.at(row - 1);
+	int pos = m_rowPtr.at(row);
 
-	for (; pos < m_rowPtr.at(row); pos++)
+	for (; pos < m_rowPtr.at(row + 1); pos++)
 	{
 		value = m_value.at(pos);
 		rowValue.append(value);
@@ -221,7 +221,7 @@ void SparseMatrix<T>::destruct()
 template<typename T>
 void SparseMatrix<T>::validateCoordinates(int row, int col) const
 {
-	if (row < 1 || col < 1 || row > m_numRows || col > m_numCols) {
+	if (row < 0 || col < 0 || row >= m_numRows || col >= m_numCols) {
 		throw InvalidCoordinatesException("Coordinates out of range.");
 	}
 }

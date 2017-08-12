@@ -5,6 +5,8 @@ Model::Model(QWidget *parent)
 {
 	m_mesh = new Mesh();
 	m_shaderProgram = nullptr;
+
+	m_displayWay = zcg::FILL;
 }
 
 
@@ -16,18 +18,7 @@ Model::~Model()
 // ========= OpenGL context build function =============
 bool Model::loadMeshFromFile(QString fileName)
 {
-	// Read file via ASSIMP, 
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(fileName.toStdString(), aiProcess_Triangulate | aiProcess_FlipUVs);
-	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
-	{
-		qDebug() << "ERROR::ASSIMP:: " << importer.GetErrorString();
-		return false;
-	}
-	// Most of the file formats don't really support complex scenes, but a single model only.
-	aiMesh *mesh = scene->mMeshes[0];
-	
-	m_mesh->setupMeshByAimesh(mesh);  
+	m_mesh->buildMesh(fileName);
 	return true;
 }
 
@@ -44,6 +35,9 @@ void Model::buildShaderProgram(QString vertexFile, QString fragmentFile)
 
 	// link for compile shader
 	m_shaderProgram->link();
+
+	// ==========  get uniform value location ============
+	this->getUniformLoc();
 }
 
 void Model::buildVAOAndVBO()
@@ -64,9 +58,11 @@ void Model::buildVAOAndVBO()
 	// memory for vertex position and normal
 	m_vbo.allocate(m_mesh->getVertexCount() * 2 * 3 * sizeof(float));
 	// position
+	glEnableVertexAttribArray(0);
 	m_vbo.write(0, m_mesh->getVertexPos(), m_mesh->getVertexCount() * sizeof(float) * 3);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	// normal
+	glEnableVertexAttribArray(1);
 	m_vbo.write(m_mesh->getVertexCount() * sizeof(float) * 3, m_mesh->getVertexNormal(), m_mesh->getVertexCount() * sizeof(float) * 3);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(m_mesh->getVertexCount() * sizeof(float) * 3));
 
@@ -81,6 +77,7 @@ void Model::draw()
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEBUG_OUTPUT);
 
+	// set uniform value
 	this->setUniformValue();
 
 	m_shaderProgram->bind();
@@ -102,10 +99,12 @@ void Model::draw()
 		break;
 	}
 
-	glDrawArrays(GL_TRIANGLES, 0, m_mesh->getVertexCount() * 3);
+	//glDrawArrays(GL_TRIANGLES, 0, m_mesh->getVertexCount() * 3);
+	glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
 
 	m_vao.release();
 	m_shaderProgram->release();
+
 }
 
 // ========= set uniform value ===========
@@ -131,7 +130,7 @@ void Model::getUniformLoc()
 {
 	m_shaderProgram->bind();
 	
-	m_modelMatLoc = m_shaderProgram->uniformLocation("modleMat");
+	m_modelMatLoc = m_shaderProgram->uniformLocation("modelMat");
 	m_viewMatLoc = m_shaderProgram->uniformLocation("viewMat");
 	m_projMatLoc = m_shaderProgram->uniformLocation("projMat");
 

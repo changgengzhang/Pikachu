@@ -13,6 +13,6 @@ out vec4 vertPosition;
 
 void main()
 {
-	gl_Position = projMat * viewMat * modelMat * vec4(vertex, 1.0f);
+	gl_Position = projMat * viewMat * modelMat * vec4(position, 1.0f);
 	vertPosition = gl_Position;
 }

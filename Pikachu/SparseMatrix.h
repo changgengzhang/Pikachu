@@ -52,6 +52,4 @@ private:
 };
 
 
-
-
 #endif // !SPARSE_MATRIX_H

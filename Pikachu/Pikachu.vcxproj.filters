@@ -118,10 +118,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="modelShader.vert">
+    <None Include="Shader\modelShader.frag">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="modelShader.frag">
+    <None Include="Shader\modelShader.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
