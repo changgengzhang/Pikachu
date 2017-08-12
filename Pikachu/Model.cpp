@@ -6,12 +6,13 @@ Model::Model(QWidget *parent)
 	m_mesh = new Mesh();
 	m_shaderProgram = nullptr;
 
-	m_displayWay = zcg::FILL;
+	m_displayWay = zcg::POINT;
 }
 
 
 Model::~Model()
 {
+
 }
 
 

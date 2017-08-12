@@ -4,7 +4,7 @@ RenderView::RenderView(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
 	m_model = new Model();
-	m_scrWidth = 800;
+	m_scrWidth = 1000;
 	m_scrHeight = 800;
 }
 
@@ -24,7 +24,7 @@ void RenderView::initializeGL()
 	m_viewMat = glm::lookAt(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	m_projMat = glm::perspective(glm::radians(45.0f), m_scrWidth / m_scrWidth, 0.01f, 100.0f);
 
-	m_model->loadMeshFromFile("./sphere.obj");
+	m_model->loadMeshFromFile("../Data/Model/sphere.obj");
 	m_model->buildShaderProgram("./shader/modelShader.vert", "./shader/modelShader.frag");
 	m_model->buildVAOAndVBO();
 }
