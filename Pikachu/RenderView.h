@@ -29,8 +29,15 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *mouseEvent) override;
 	void mouseMoveEvent(QMouseEvent *mouseEvent) override;
 
+private:
+	void buildModel();
+
+
 private slots:
 	void cleanup();
+
+public slots: 
+	void getModelFilePath(QString filePath);
 
 private:
 	// ========= viewport ============
@@ -41,7 +48,14 @@ private:
 	glm::mat4 m_viewMat;
 	glm::mat4 m_projMat;
 
+	// ========= Model ===============
 	Model *m_model;
+	QString m_modelFilePath;
+
+
+	// ========= shader file path =========
+	QString m_vertexShaderFilePath;
+	QString m_fragmentShaderFilePath;
 };
 
 

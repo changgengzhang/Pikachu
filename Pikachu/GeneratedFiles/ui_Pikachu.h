@@ -166,7 +166,7 @@ public:
         tabWidget_4->setCurrentIndex(0);
         bgOperationTab->setCurrentIndex(0);
         tabWidget->setCurrentIndex(0);
-        tabWidget_2->setCurrentIndex(1);
+        tabWidget_2->setCurrentIndex(0);
         sensitivityTab->setCurrentIndex(0);
 
 

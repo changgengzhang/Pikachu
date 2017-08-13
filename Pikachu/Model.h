@@ -41,6 +41,9 @@ public:
 	void setViewMatValue(glm::mat4 viewMat);
 	void setProjMatValue(glm::mat4 projMat);
 
+	// ======== flags value get =============
+	bool isModleLoaded();
+
 private:
 	// ========= tools functions ============	
 	void getUniformLoc();
@@ -48,17 +51,17 @@ private:
 
 private:
 	// ========== menber value ==============
+	bool m_isModelLoaded;
 	Mesh* m_mesh;
 	QString m_fileName;
-
 	zcg::MeshDisplayWay m_displayWay;
 
-	// ========  shader ===============
+	// ========  shader value ===============
 	QOpenGLShaderProgram *m_shaderProgram;
 	QOpenGLVertexArrayObject m_vao;
 	QOpenGLBuffer m_vbo;
 	
-	// ========== MVP matrix ==========
+	// ========== uniform value ==========
 	glm::mat4 m_modelMat;
 	glm::mat4 m_viewMat;
 	glm::mat4 m_projMat;

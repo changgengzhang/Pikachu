@@ -22,7 +22,7 @@ private:
 
 	// =========== signals ==========
 signals:
-	void modleFile(QString fileName);
+	void getModelFilePath(QString filePath);
 
 	// ============ slots ===========
 private slots:

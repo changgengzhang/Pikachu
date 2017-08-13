@@ -6,6 +6,9 @@ RenderView::RenderView(QWidget *parent)
 	m_model = new Model();
 	m_scrWidth = 1000;
 	m_scrHeight = 800;
+
+	m_vertexShaderFilePath = "./shader/modelShader.vert";
+	m_fragmentShaderFilePath = "./shader/modelShader.frag";
 }
 
 RenderView::~RenderView()
@@ -24,9 +27,6 @@ void RenderView::initializeGL()
 	m_viewMat = glm::lookAt(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	m_projMat = glm::perspective(glm::radians(45.0f), m_scrWidth / m_scrWidth, 0.01f, 100.0f);
 
-	m_model->loadMeshFromFile("../Data/Model/sphere.obj");
-	m_model->buildShaderProgram("./shader/modelShader.vert", "./shader/modelShader.frag");
-	m_model->buildVAOAndVBO();
 }
 
 void RenderView::paintGL()
@@ -34,11 +34,15 @@ void RenderView::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// set MVP model
-	m_model->setModelMatValue(m_modelMat);
-	m_model->setViewMatValue(m_viewMat);
-	m_model->setProjMatValue(m_projMat);
+	if (m_model->isModleLoaded())
+	{
+		m_model->setModelMatValue(m_modelMat);
+		m_model->setViewMatValue(m_viewMat);
+		m_model->setProjMatValue(m_projMat);
 
-	m_model->draw();
+		m_model->draw();
+	}
+
 }
 
 /*
@@ -65,7 +69,26 @@ void RenderView::mouseMoveEvent(QMouseEvent *mouseEvent)
 
 }
 
+
+// ================ helper function =============
+void RenderView::buildModel()
+{
+	makeCurrent();
+	m_model->loadMeshFromFile(m_modelFilePath);
+	m_model->buildShaderProgram(m_vertexShaderFilePath, m_fragmentShaderFilePath);
+	m_model->buildVAOAndVBO();
+}
+
+// ================= slots =================
 void RenderView::cleanup()
 {
 	delete m_model;
+}
+
+
+void RenderView::getModelFilePath(QString filePath)
+{
+	m_modelFilePath = filePath;
+	buildModel();
+	update();
 }

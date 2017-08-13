@@ -3,10 +3,11 @@
 Model::Model(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
-	m_mesh = new Mesh();
-	m_shaderProgram = nullptr;
+	m_isModelLoaded = false;
+	m_displayWay = zcg::FILL;
 
-	m_displayWay = zcg::POINT;
+	m_mesh = nullptr;
+	m_shaderProgram = nullptr;
 }
 
 
@@ -19,6 +20,13 @@ Model::~Model()
 // ========= OpenGL context build function =============
 bool Model::loadMeshFromFile(QString fileName)
 {
+	// is created
+	if (m_mesh != nullptr)
+	{
+		delete m_mesh;
+	}
+
+	m_mesh = new Mesh();
 	m_mesh->buildMesh(fileName);
 	return true;
 }
@@ -26,6 +34,12 @@ bool Model::loadMeshFromFile(QString fileName)
 
 void Model::buildShaderProgram(QString vertexFile, QString fragmentFile)
 {
+	// is build
+	if (m_shaderProgram != nullptr)
+	{
+		delete m_shaderProgram;
+	}
+
 	makeCurrent();
 	initializeOpenGLFunctions();
 
@@ -43,11 +57,30 @@ void Model::buildShaderProgram(QString vertexFile, QString fragmentFile)
 
 void Model::buildVAOAndVBO()
 {
-	if (m_shaderProgram == nullptr)
+	if (m_mesh == nullptr)
 	{
+		// todo: throw exception
 		return;
 	}
 
+	if (m_shaderProgram == nullptr)
+	{
+		// todo: throw exception
+		return;
+	}
+
+	makeCurrent();
+	// initial
+	if (m_vao.isCreated())
+	{
+		m_vao.destroy();
+	}
+	
+	if (m_vbo.isCreated())
+	{
+		m_vbo.create();
+	}
+	// build
 	m_shaderProgram->bind();
 	m_vao.create();
 	m_vao.bind();
@@ -70,10 +103,15 @@ void Model::buildVAOAndVBO()
 	m_vbo.release();
 	m_vao.release();
 	m_shaderProgram->release();
+
+	// can draw
+	m_isModelLoaded = true;
 }
 
 void Model::draw()
 {
+	makeCurrent();
+
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEBUG_OUTPUT);
@@ -147,4 +185,10 @@ void Model::setUniformValue()
 	glUniformMatrix4fv(m_projMatLoc, 1, GL_FALSE, glm::value_ptr(m_projMat));
 
 	m_shaderProgram->release();
+}
+
+// ======== flags value get =============
+bool Model::isModleLoaded()
+{
+	return m_isModelLoaded;
 }
