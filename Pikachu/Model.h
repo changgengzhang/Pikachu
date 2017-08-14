@@ -40,9 +40,12 @@ public:
 	void setModelMatValue(glm::mat4 modelMat);
 	void setViewMatValue(glm::mat4 viewMat);
 	void setProjMatValue(glm::mat4 projMat);
+	void setPolygonWay(zcg::MeshPolygonWay polygonWay);
 
-	// ======== flags value get set =============
+	// ======== flags value get =============
 	bool isModelLoaded();
+	
+	// ======== helper =====================
 	void delModel();
 
 private:
@@ -55,7 +58,7 @@ private:
 	bool m_isModelLoaded;
 	Mesh* m_mesh;
 	QString m_fileName;
-	zcg::MeshDisplayWay m_displayWay;
+	zcg::MeshPolygonWay m_polygonWay;
 
 	// ========  shader value ===============
 	QOpenGLShaderProgram *m_shaderProgram;

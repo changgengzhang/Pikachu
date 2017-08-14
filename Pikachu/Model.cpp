@@ -4,7 +4,7 @@ Model::Model(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
 	m_isModelLoaded = false;
-	m_displayWay = zcg::FILL;
+	m_polygonWay = zcg::NONE;
 
 	m_mesh = nullptr;
 	m_shaderProgram = nullptr;
@@ -131,28 +131,30 @@ void Model::draw()
 	m_shaderProgram->bind();
 	m_vao.bind();
 	// draw mode
-	switch (m_displayWay)
+	switch (m_polygonWay)
 	{
+	case zcg::NONE:
+		break;
 	case zcg::FILL:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
 		break;
 	case zcg::LINE:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
 		break;
 	case zcg::POINT:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
 		break;
 	default:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
 		break;
 	}
 
-	//glDrawArrays(GL_TRIANGLES, 0, m_mesh->getVertexCount() * 3);
-	glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
-
 	m_vao.release();
 	m_shaderProgram->release();
-
 }
 
 // ========= set uniform value ===========
@@ -172,6 +174,12 @@ void Model::setProjMatValue(glm::mat4 projMat)
 {
 	m_projMat = projMat;
 }
+
+void Model::setPolygonWay(zcg::MeshPolygonWay polygonWay)
+{
+	m_polygonWay = polygonWay;
+}
+
 
 // ========= tools functions ============	
 void Model::getUniformLoc()
@@ -203,6 +211,7 @@ bool Model::isModelLoaded()
 }
 
 
+// =========== helper function =============
 void Model::delModel()
 {
 	// pretend to delete

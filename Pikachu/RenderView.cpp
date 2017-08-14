@@ -93,9 +93,18 @@ void RenderView::getModelFilePath(QString filePath)
 	update();
 }
 
+
 void RenderView::onModelDelBtnClicked()
 {
 	makeCurrent();
 	m_model->delModel();
+	update();
+}
+
+
+void RenderView::setModelPolygonWay(zcg::MeshPolygonWay polygonWay)
+{
+	makeCurrent();
+	m_model->setPolygonWay(polygonWay);
 	update();
 }

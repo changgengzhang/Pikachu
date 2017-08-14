@@ -5,8 +5,9 @@
 #include <glm/glm.hpp>
 
 namespace zcg {
-	enum MeshDisplayWay
+	enum MeshPolygonWay
 	{
+		NONE,
 		FILL,
 		LINE,
 		POINT,

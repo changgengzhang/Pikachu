@@ -16,6 +16,7 @@ public:
 
 private:
 	Ui::PikachuClass ui;
+	zcg::MeshPolygonWay m_polygonWay;
 
 	// =========== helper function ==========
 	void buildSlotsAndSignals();
@@ -23,11 +24,14 @@ private:
 	// =========== signals ==========
 signals:
 	void getModelFilePath(QString filePath);
+	void setModelPolygonWay(zcg::MeshPolygonWay polygonWay);
 
 	// ============ slots ===========
 private slots:
 	void onModelLoadBtnClicked();
-	
+	void onModelPolygonFaceBtnClicked(int state);
+	void onModelPolygonLineBtnClicked(int state);
+	void onModelPolygonPointBtnClicked(int state);
 
 };
 
