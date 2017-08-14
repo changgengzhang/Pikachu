@@ -27,7 +27,7 @@ signals:
 	// ============ slots ===========
 private slots:
 	void onModelLoadBtnClicked();
-	void onModelDelBtnClicked();
+	
 
 };
 

@@ -17,8 +17,9 @@ Pikachu::~Pikachu()
 void Pikachu::buildSlotsAndSignals()
 {
 	connect(ui.modelLoadBtn, SIGNAL(clicked()), this, SLOT(onModelLoadBtnClicked()));
-	//connect(this, SIGNAL(getModelFilePath(QString filePath)), ui.renderView, SLOT(getModelFilePath(QString filePath)));
-	connect(this, &Pikachu::getModelFilePath, ui.renderView, &RenderView::getModelFilePath);
+	connect(this, SIGNAL(getModelFilePath(QString)), ui.renderView, SLOT(getModelFilePath(QString)));
+	connect(ui.modelDelBtn, SIGNAL(clicked()), ui.renderView, SLOT(onModelDelBtnClicked()));
+	
 }
 
 
@@ -31,9 +32,4 @@ void Pikachu::onModelLoadBtnClicked()
 		emit getModelFilePath(filePath);
 	}
 	// cancel load model
-}
-
-void Pikachu::onModelDelBtnClicked()
-{
-
 }

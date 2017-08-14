@@ -43,8 +43,17 @@ bool Mesh::buildMesh(QString fileName)
 	QString type = fileName.split(".").last();
 	if (type == "obj")
 	{
-		this->parseFromObjFile(fileName);
-		return true;
+		bool ret = this->parseFromObjFile(fileName);
+		if (ret)
+		{
+			return true;
+		}
+		else
+		{
+			qDebug() << "ERROR::MESH::buildMesh::parseFromObjFile: Failed";
+			return false;
+		}
+		
 	}
 	else if (type == "ply")
 	{
@@ -60,6 +69,7 @@ bool Mesh::parseFromObjFile(QString fileName)
 	QFile file(fileName);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
+		qDebug() << "ERROR::MESH::parseFromObjFile: model file open failed";
 		return false;
 	}
 	QTextStream stream(&file);

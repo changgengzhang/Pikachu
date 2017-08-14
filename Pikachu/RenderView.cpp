@@ -34,7 +34,7 @@ void RenderView::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// set MVP model
-	if (m_model->isModleLoaded())
+	if (m_model->isModelLoaded())
 	{
 		m_model->setModelMatValue(m_modelMat);
 		m_model->setViewMatValue(m_viewMat);
@@ -90,5 +90,12 @@ void RenderView::getModelFilePath(QString filePath)
 {
 	m_modelFilePath = filePath;
 	buildModel();
+	update();
+}
+
+void RenderView::onModelDelBtnClicked()
+{
+	makeCurrent();
+	m_model->delModel();
 	update();
 }

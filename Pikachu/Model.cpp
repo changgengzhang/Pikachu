@@ -13,7 +13,7 @@ Model::Model(QWidget *parent)
 
 Model::~Model()
 {
-
+	this->delModel();
 }
 
 
@@ -27,8 +27,17 @@ bool Model::loadMeshFromFile(QString fileName)
 	}
 
 	m_mesh = new Mesh();
-	m_mesh->buildMesh(fileName);
-	return true;
+	bool ret = m_mesh->buildMesh(fileName);
+
+	if (ret)
+	{
+		return true;
+	}
+	else
+	{
+		qDebug() << "ERROR::MODEL::loadMeshFromFile: buildMesh Failed";
+		return false;
+	}
 }
 
 
@@ -78,7 +87,7 @@ void Model::buildVAOAndVBO()
 	
 	if (m_vbo.isCreated())
 	{
-		m_vbo.create();
+		m_vbo.destroy();
 	}
 	// build
 	m_shaderProgram->bind();
@@ -188,7 +197,36 @@ void Model::setUniformValue()
 }
 
 // ======== flags value get =============
-bool Model::isModleLoaded()
+bool Model::isModelLoaded()
 {
 	return m_isModelLoaded;
+}
+
+
+void Model::delModel()
+{
+	// pretend to delete
+	m_isModelLoaded = false;
+
+	if (m_mesh != nullptr)
+	{
+		delete m_mesh;
+		m_mesh = nullptr;
+	}
+
+	if (m_shaderProgram != nullptr)
+	{
+		delete m_shaderProgram;
+		m_shaderProgram = nullptr;
+	}
+
+	if (m_vao.isCreated())
+	{
+		m_vao.destroy();
+	}
+
+	if (m_vbo.isCreated())
+	{
+		m_vbo.destroy();
+	}
 }

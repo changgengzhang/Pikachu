@@ -41,8 +41,9 @@ public:
 	void setViewMatValue(glm::mat4 viewMat);
 	void setProjMatValue(glm::mat4 projMat);
 
-	// ======== flags value get =============
-	bool isModleLoaded();
+	// ======== flags value get set =============
+	bool isModelLoaded();
+	void delModel();
 
 private:
 	// ========= tools functions ============	

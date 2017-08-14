@@ -38,6 +38,8 @@ private slots:
 
 public slots: 
 	void getModelFilePath(QString filePath);
+	void onModelDelBtnClicked();
+
 
 private:
 	// ========= viewport ============
@@ -51,7 +53,6 @@ private:
 	// ========= Model ===============
 	Model *m_model;
 	QString m_modelFilePath;
-
 
 	// ========= shader file path =========
 	QString m_vertexShaderFilePath;
