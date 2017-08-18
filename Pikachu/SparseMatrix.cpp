@@ -157,7 +157,7 @@ bool SparseMatrix<T>::isExist(int row, int col) const
 
 
 template<typename T>
-QVector<T> SparseMatrix<T>::getRow(int row)
+QVector<T> SparseMatrix<T>::getRowValue(int row)
 {
 	this->validateCoordinates(row, m_numCols);
 

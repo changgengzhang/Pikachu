@@ -300,7 +300,7 @@ void Mesh::buildAdjacentFF()
 		v1 = m_faceIndex[3 * i + 1];
 		v2 = m_faceIndex[3 * i + 2];
 
-		oneRow = m_adjacentVF->getRow(v0);
+		oneRow = m_adjacentVF->getRowValue(v0);
 		for (uint j = 0; j < oneRow.count(); j++)
 		{
 			faceIndex = oneRow.at(j);
@@ -312,7 +312,7 @@ void Mesh::buildAdjacentFF()
 			}
 		}
 
-		oneRow = m_adjacentVF->getRow(v1);
+		oneRow = m_adjacentVF->getRowValue(v1);
 		for (uint j = 0; j < oneRow.count(); j++)
 		{
 			faceIndex = oneRow.at(j);
@@ -322,7 +322,7 @@ void Mesh::buildAdjacentFF()
 			}
 		}
 
-		oneRow = m_adjacentVF->getRow(v2);
+		oneRow = m_adjacentVF->getRowValue(v2);
 		for (uint j = 0; j < oneRow.count(); j++)
 		{
 			faceIndex = oneRow.at(j);
@@ -334,6 +334,22 @@ void Mesh::buildAdjacentFF()
 	}
 }
 
+
+void Mesh::findBoundaryVertex()
+{
+	int numAdjV, numAdjF;
+
+	for (uint i = 0; i < m_vertexCount; i++)
+	{
+		numAdjV = m_adjacentVV->getRowElemNum(i);
+		numAdjV = m_adjacentVF->getRowElemNum(i);
+		m_isBoundary[i] = (numAdjV != numAdjF);
+		if (numAdjV != numAdjF)
+		{
+			m_flag[i] = 1;
+		}
+	}
+}
 
 // ====================== tool function ================================
 const glm::vec3  Mesh::computeMaxCoord() const

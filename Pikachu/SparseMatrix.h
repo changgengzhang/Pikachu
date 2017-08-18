@@ -27,7 +27,7 @@ public:
 	SparseMatrix<T>& set(T value, int row, int col);
 	bool isExist(int row, int col) const;
 
-	QVector<T> getRow(int row);
+	QVector<T> getRowValue(int row);
 	uint getRowElemNum(int row);
 
 private:

@@ -54,7 +54,7 @@ private:
 	void buildAdjacentVV();
 	void buildAdjacentVF();
 	void buildAdjacentFF();
-	//void findBoundaryVertex();
+	void findBoundaryVertex();
 
 	// ============ tools function ============
 	const glm::vec3 computeMaxCoord() const;
