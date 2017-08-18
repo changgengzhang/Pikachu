@@ -27,7 +27,6 @@ public:
 	~Mesh();
 
 	// ========== interactive with outer =================
-	bool setupMeshByAimesh(aiMesh *mesh);
 	bool buildMesh(QString fileName);
 	
 	// ========= get value ===================
@@ -39,9 +38,11 @@ public:
 	const float* getVertexNormal() const;
 	const float* getFaceNormal() const;
 
+	const glm::vec3 getMeshCenter() const;
+
 private:
 	// ======== prase molde file to mesh ============
-	bool parseFromObjFile(QString fileName);
+	bool parseMeshFromObjFile(QString fileName);
 
 	// ========= malloc memory for mesh ==============
 	void initMeshValue(QVector<float> &vlist, QVector<uint> &flist);
@@ -53,10 +54,11 @@ private:
 	void buildAdjacentVV();
 	void buildAdjacentVF();
 	void buildAdjacentFF();
+	//void findBoundaryVertex();
 
 	// ============ tools function ============
-	inline glm::vec3 maxBBOXCoord(glm::vec3 va, glm::vec3 vb) const;
-	inline glm::vec3 minBBOXCoord(glm::vec3 va, glm::vec3 vb) const;
+	const glm::vec3 computeMaxCoord() const;
+	const glm::vec3 computeMinCoord() const;
 	inline glm::vec3 getOneVertex(uint index) const;
 	bool isFaceContainVertex(uint fIndex, uint vIndex) const;
 

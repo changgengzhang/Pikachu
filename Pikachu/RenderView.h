@@ -37,9 +37,9 @@ private slots:
 	void cleanup();
 
 public slots: 
-	void getModelFilePath(QString filePath);
+	void acceptFilePath(QString filePath);
 	void onModelDelBtnClicked();
-	void setModelPolygonWay(zcg::MeshPolygonWay polygonWay);
+	void acceptPolygonType(zcg::MeshPolygonWay polygonWay);
 
 
 private:

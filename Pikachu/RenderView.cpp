@@ -86,7 +86,7 @@ void RenderView::cleanup()
 }
 
 
-void RenderView::getModelFilePath(QString filePath)
+void RenderView::acceptFilePath(QString filePath)
 {
 	m_modelFilePath = filePath;
 	buildModel();
@@ -102,7 +102,7 @@ void RenderView::onModelDelBtnClicked()
 }
 
 
-void RenderView::setModelPolygonWay(zcg::MeshPolygonWay polygonWay)
+void RenderView::acceptPolygonType(zcg::MeshPolygonWay polygonWay)
 {
 	makeCurrent();
 	m_model->setPolygonWay(polygonWay);

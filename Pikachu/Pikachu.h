@@ -15,16 +15,17 @@ public:
 	~Pikachu();
 
 private:
-	Ui::PikachuClass ui;
+	Ui::PikachuClass m_ui;
 	zcg::MeshPolygonWay m_polygonWay;
 
 	// =========== helper function ==========
 	void buildSlotsAndSignals();
+	void initUi();
 
 	// =========== signals ==========
 signals:
-	void getModelFilePath(QString filePath);
-	void setModelPolygonWay(zcg::MeshPolygonWay polygonWay);
+	void deliverString(QString filePath);
+	void deliverPolygonType(zcg::MeshPolygonWay polygonWay);
 
 	// ============ slots ===========
 private slots:

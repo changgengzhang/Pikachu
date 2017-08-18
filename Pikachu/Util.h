@@ -13,7 +13,7 @@ namespace zcg {
 		POINT,
 	};
 
-	inline glm::vec3 maxBBOXCoord(glm::vec3 va, glm::vec3 vb)
+	inline glm::vec3 MaxBBOXCoord(glm::vec3 va, glm::vec3 vb)
 	{
 		return glm::vec3(
 			va.x > vb.x ? va.x : vb.x,
@@ -22,7 +22,7 @@ namespace zcg {
 		);
 	}
 
-	inline glm::vec3 minBBOXCoord(glm::vec3 va, glm::vec3 vb)
+	inline glm::vec3 MinBBOXCoord(glm::vec3 va, glm::vec3 vb)
 	{
 		return glm::vec3(
 			va.x < vb.x ? va.x : vb.x,

@@ -43,7 +43,7 @@ public:
 	void setPolygonWay(zcg::MeshPolygonWay polygonWay);
 
 	// ======== flags value get =============
-	bool isModelLoaded();
+	const bool isModelLoaded() const;
 	
 	// ======== helper =====================
 	void delModel();

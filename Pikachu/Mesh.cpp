@@ -43,7 +43,7 @@ bool Mesh::buildMesh(QString fileName)
 	QString type = fileName.split(".").last();
 	if (type == "obj")
 	{
-		bool ret = this->parseFromObjFile(fileName);
+		bool ret = this->parseMeshFromObjFile(fileName);
 		if (ret)
 		{
 			return true;
@@ -64,7 +64,7 @@ bool Mesh::buildMesh(QString fileName)
 
 
 // ======== prase molde file to mesh ============
-bool Mesh::parseFromObjFile(QString fileName)
+bool Mesh::parseMeshFromObjFile(QString fileName)
 {
 	QFile file(fileName);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -137,9 +137,6 @@ void Mesh::initMeshValue(QVector<float> &vlist, QVector<uint> &flist)
 		m_originalPos[i * 3] = x;
 		m_originalPos[i * 3 + 1] = y;
 		m_originalPos[i * 3 + 2] = z;
-
-		m_maxCoord = this->maxBBOXCoord(m_maxCoord, glm::vec3(x, y, z));
-		m_minCoord = this->minBBOXCoord(m_minCoord, glm::vec3(x, y, z));
 	}
 
 	for (uint i = 0; i < m_faceCount; i++)
@@ -163,7 +160,7 @@ void Mesh::initMeshValue(QVector<float> &vlist, QVector<uint> &flist)
 
 void Mesh::scaleToUnitBox()
 {
-	glm::vec3 dist = m_maxCoord - m_minCoord;
+	glm::vec3 dist = this->computeMaxCoord() - this->computeMinCoord();
 	
 	float scale = (dist.x > dist.y) ? (dist.x > dist.z ? dist.x : dist.z) : (dist.y > dist.z ? dist.y : dist.z);
 
@@ -182,7 +179,7 @@ void Mesh::scaleToUnitBox()
 // do not take the center as the center of view coordinate
 void Mesh::moveToCenter()
 {
-	glm::vec3 center = (m_maxCoord + m_minCoord) / 2.0f;
+	glm::vec3 center = (this->computeMaxCoord() - this->computeMinCoord()) / 2.0f;
 	m_meshCenter = center;
 
 	for (uint i = 0; i < m_vertexCount; i++)
@@ -337,30 +334,51 @@ void Mesh::buildAdjacentFF()
 	}
 }
 
+
 // ====================== tool function ================================
+const glm::vec3  Mesh::computeMaxCoord() const
+{
+	glm::vec3 maxCoord = glm::vec3(std::numeric_limits<float>::min());
+	glm::vec3 vertex;
+
+	for (uint i = 0; i < m_vertexCount; i++)
+	{
+		vertex = glm::vec3(m_vertexPos[i * 3], m_vertexPos[i * 3 + 1], m_vertexPos[i * 3 + 1]);
+		maxCoord = glm::vec3(
+			vertex.x > maxCoord.x ? vertex.x : maxCoord.x,
+			vertex.y > maxCoord.y ? vertex.y : maxCoord.y,
+			vertex.z > maxCoord.z ? vertex.z : maxCoord.z
+		);
+	}
+
+	return maxCoord;
+}
+
+
+const glm::vec3 Mesh::computeMinCoord() const
+{
+	glm::vec3 minCoord = glm::vec3(std::numeric_limits<float>::max());
+	glm::vec3 vertex;
+
+	for (uint i = 0; i < m_vertexCount; i++)
+	{
+		vertex = glm::vec3(m_vertexPos[i * 3], m_vertexPos[i * 3 + 1], m_vertexPos[i * 3 + 1]);
+		minCoord = glm::vec3(
+			vertex.x < minCoord.x ? vertex.x : minCoord.x,
+			vertex.y < minCoord.y ? vertex.y : minCoord.y,
+			vertex.z < minCoord.z ? vertex.z : minCoord.z
+		);
+	}
+
+	return minCoord;
+}
+
 
 glm::vec3 Mesh::getOneVertex(uint index) const
 {
 	return glm::vec3(m_vertexPos[index * 3], m_vertexPos[index * 3 + 1], m_vertexPos[index * 3 + 2]);
 }
 
-inline glm::vec3 Mesh::maxBBOXCoord(glm::vec3 va, glm::vec3 vb) const
-{
-	return glm::vec3(
-		va.x > vb.x ? va.x : vb.x,
-		va.y > vb.y ? va.y : vb.y,
-		va.z > vb.z ? va.z : vb.z
-	);
-}
-
-inline glm::vec3 Mesh::minBBOXCoord(glm::vec3 va, glm::vec3 vb) const
-{
-	return glm::vec3(
-		va.x < vb.x ? va.x : vb.x,
-		va.y < vb.y ? va.y : vb.y,
-		va.z < vb.z ? va.z : vb.z
-	);
-}
 
 // we assume that face index is start from one
 bool Mesh::isFaceContainVertex(uint fIndex, uint vIndex) const
@@ -413,4 +431,9 @@ const float* Mesh::getVertexNormal() const
 const float* Mesh::getFaceNormal() const
 {
 	return m_faceNormal;
+}
+
+const glm::vec3 Mesh::getMeshCenter() const
+{
+	return m_meshCenter;
 }
