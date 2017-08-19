@@ -16,7 +16,7 @@
 #include <glm/matrix.hpp>
 
 #include "SparseMatrix.h"
-
+#include "Util.h"
 
 class Mesh
 {
@@ -86,8 +86,11 @@ private:
 	SparseMatrix<uint>* m_adjacentVF;
 	SparseMatrix<uint>* m_adjacentFF;
 
-	
+	// ============= for test ================
+public:
+	void printMemberValue() const;
 };
+
 
 #endif // !MESH_H
 

@@ -13,33 +13,16 @@ namespace zcg {
 		POINT,
 	};
 
-	inline glm::vec3 MaxBBOXCoord(glm::vec3 va, glm::vec3 vb)
+	template<typename T> void printArray(char* arrayName,const T *arrayValue, uint arraySize)
 	{
-		return glm::vec3(
-			va.x > vb.x ? va.x : vb.x,
-			va.y > vb.y ? va.y : vb.y,
-			va.z > vb.z ? va.z : vb.z
-		);
-	}
-
-	inline glm::vec3 MinBBOXCoord(glm::vec3 va, glm::vec3 vb)
-	{
-		return glm::vec3(
-			va.x < vb.x ? va.x : vb.x,
-			va.y < vb.y ? va.y : vb.y,
-			va.z < vb.z ? va.z : vb.z
-		);
-	}
-
-	template<typename T> void printArray(const T *array, uint size)
-	{
-		for (uint i = 0; i < size; i++)
+		QString out;
+		for (uint i = 0; i < arraySize; i++)
 		{
-			qDebug() << array[i];
+			out += arrayValue[i];
 		}
 	}
 
-	template<uint> void printArray(const uint *array, uint size);
+	template<uint> void printArray(char* arrayName, const uint *arrayValue, uint arraySize);
 
 }
 

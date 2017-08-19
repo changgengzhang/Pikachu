@@ -105,8 +105,8 @@ SparseMatrix<T>& SparseMatrix<T>::set(T value, int row, int col)
 			// remove this value
 			m_value.erase(m_value.begin() + pos);
 			m_colIndex.erase(m_colIndex.begin() + pos);
-			// update row ptr
-			for (int i = row; i < m_numRows; i++)
+			// update row ptr, attention update row ptr begin in next row 
+			for (int i = row + 1; i < m_numRows + 1; i++)
 			{
 				m_rowPtr[i] -= 1;
 			}
@@ -123,7 +123,7 @@ SparseMatrix<T>& SparseMatrix<T>::set(T value, int row, int col)
 		m_colIndex.insert(m_colIndex.begin() + pos, col);
 
 		// update row ptr
-		for (int i = row; i < m_numRows; i++)
+		for (int i = row + 1; i < m_numRows + 1; i++)
 		{
 			m_rowPtr[i] += 1;
 		}
@@ -157,9 +157,9 @@ bool SparseMatrix<T>::isExist(int row, int col) const
 
 
 template<typename T>
-QVector<T> SparseMatrix<T>::getRowValue(int row)
+const QVector<T> SparseMatrix<T>::getRowValue(int row) const
 {
-	this->validateCoordinates(row, m_numCols);
+	this->validateCoordinates(row, m_numCols - 1);
 
 	QVector<T> rowValue;
 	T value;
@@ -175,9 +175,9 @@ QVector<T> SparseMatrix<T>::getRowValue(int row)
 
 
 template<typename T>
-uint SparseMatrix<T>::getRowElemNum(int row)
+uint SparseMatrix<T>::getRowElemNum(int row) const
 {
-	return this->getRow(row).count();
+	return this->getRowValue(row).count();
 }
 
 // ===================  assistant function ==============
@@ -185,7 +185,7 @@ uint SparseMatrix<T>::getRowElemNum(int row)
 template<typename T>
 void SparseMatrix<T>::construct(int rows, int columns)
 {
-	if (rows < 1 || columns < 1)
+	if (rows < 0 || columns < 0)
 	{
 		throw InvalidDimensionsException("Matrix dimensions cannot be zero or negative.");
 	}
@@ -225,6 +225,26 @@ void SparseMatrix<T>::validateCoordinates(int row, int col) const
 		throw InvalidCoordinatesException("Coordinates out of range.");
 	}
 }
+
+template<typename T>
+void SparseMatrix<T>::printMatrix() const
+{
+	QString out;
+	int pos;
+
+	for (uint i = 0; i < m_rowPtr.count() - 1; i++)
+	{
+		pos = m_rowPtr.at(i);
+		out = out + "row " + QString::number(i);;
+		for (uint j = pos; j < m_rowPtr.at(i + 1); j++)
+		{
+			out = out + " (" + QString::number(m_colIndex.at(j)) + " ," + QString::number(m_value.at(j)) + ") ";
+		}
+		out.append("\n");
+	}
+	qInfo() << out.toStdString().c_str();
+}
+
 
 
 // ==================== explicit instantiations  ===========================

@@ -152,9 +152,13 @@ void Mesh::initMeshValue(QVector<float> &vlist, QVector<uint> &flist)
 	this->scaleToUnitBox();
 	this->moveToCenter();
 	this->computeNormal();
-	//this->buildAdjacentVV();
-	//this->buildAdjacentVF();
-	//this->buildAdjacentFF();
+	this->buildAdjacentVV();
+	this->buildAdjacentVF();
+	this->buildAdjacentFF();
+
+	m_adjacentVF->printMatrix();
+	m_adjacentVV->printMatrix();
+	m_adjacentFF->printMatrix();
 }
 
 
@@ -268,9 +272,7 @@ void Mesh::buildAdjacentVV()
 		m_adjacentVV->set(1, p2, p0);
 		m_adjacentVV->set(1, p2, p1);
 
-		qDebug() << "i = " << i;
 	}
-	qDebug() << "MESH::buildAdjacentVV::Done";
 }
 
 void Mesh::buildAdjacentVF()
@@ -282,7 +284,7 @@ void Mesh::buildAdjacentVF()
 		// the face index start form zero
 		m_adjacentVF->set(1, m_faceIndex[i * 3], i);
 		m_adjacentVF->set(1, m_faceIndex[i * 3 + 1], i);
-		m_adjacentVF->set(1, m_faceIndex[i * 3 + 1], i);
+		m_adjacentVF->set(1, m_faceIndex[i * 3 + 2], i);
 	}
 }
 
@@ -342,7 +344,7 @@ void Mesh::findBoundaryVertex()
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
 		numAdjV = m_adjacentVV->getRowElemNum(i);
-		numAdjV = m_adjacentVF->getRowElemNum(i);
+		numAdjF = m_adjacentVF->getRowElemNum(i);
 		m_isBoundary[i] = (numAdjV != numAdjF);
 		if (numAdjV != numAdjF)
 		{
@@ -452,4 +454,12 @@ const float* Mesh::getFaceNormal() const
 const glm::vec3 Mesh::getMeshCenter() const
 {
 	return m_meshCenter;
+}
+
+
+// ============= for test ================
+void Mesh::printMemberValue() const
+{
+	zcg::printArray("Vertex Position", m_vertexPos, m_vertexCount * 3);
+	zcg::printArray("Vertex Position", m_vertexPos, m_vertexCount * 3);
 }

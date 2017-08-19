@@ -2,7 +2,9 @@
 #define SPARSEMATRIX_H
 
 #include <qvector.h>
+#include <qdebug.h>
 #include "Exceptions.h"
+
 
 template<typename T>
 class SparseMatrix
@@ -26,9 +28,11 @@ public:
 	uint get(int row, int col) const;
 	SparseMatrix<T>& set(T value, int row, int col);
 	bool isExist(int row, int col) const;
+	const QVector<T> getRowValue(int row) const;
+	uint getRowElemNum(int row) const;
 
-	QVector<T> getRowValue(int row);
-	uint getRowElemNum(int row);
+	// ======== print ============
+	void printMatrix() const;
 
 private:
 	// ========== assistant function  ===============
