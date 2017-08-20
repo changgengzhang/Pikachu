@@ -156,9 +156,9 @@ void Mesh::initMeshValue(QVector<float> &vlist, QVector<uint> &flist)
 	this->buildAdjacentVF();
 	this->buildAdjacentFF();
 
-	m_adjacentVF->printMatrix();
-	m_adjacentVV->printMatrix();
-	m_adjacentFF->printMatrix();
+	// m_adjacentVV->printMatrix();
+	// m_adjacentVF->printMatrix();
+	// m_adjacentFF->printMatrix();
 }
 
 
@@ -302,7 +302,7 @@ void Mesh::buildAdjacentFF()
 		v1 = m_faceIndex[3 * i + 1];
 		v2 = m_faceIndex[3 * i + 2];
 
-		oneRow = m_adjacentVF->getRowValue(v0);
+		oneRow = m_adjacentVF->getOneRowColIndex(v0);
 		for (uint j = 0; j < oneRow.count(); j++)
 		{
 			faceIndex = oneRow.at(j);
@@ -314,7 +314,7 @@ void Mesh::buildAdjacentFF()
 			}
 		}
 
-		oneRow = m_adjacentVF->getRowValue(v1);
+		oneRow = m_adjacentVF->getOneRowColIndex(v1);
 		for (uint j = 0; j < oneRow.count(); j++)
 		{
 			faceIndex = oneRow.at(j);
@@ -324,11 +324,11 @@ void Mesh::buildAdjacentFF()
 			}
 		}
 
-		oneRow = m_adjacentVF->getRowValue(v2);
+		oneRow = m_adjacentVF->getOneRowColIndex(v2);
 		for (uint j = 0; j < oneRow.count(); j++)
 		{
 			faceIndex = oneRow.at(j);
-			if (faceIndex != i && isFaceContainVertex(faceIndex, v1))
+			if (faceIndex != i && isFaceContainVertex(faceIndex, v0))
 			{
 				m_adjacentFF->set(1, i, faceIndex);
 			}
@@ -343,8 +343,8 @@ void Mesh::findBoundaryVertex()
 
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
-		numAdjV = m_adjacentVV->getRowElemNum(i);
-		numAdjF = m_adjacentVF->getRowElemNum(i);
+		numAdjV = m_adjacentVV->getOneRowElemNum(i);
+		numAdjF = m_adjacentVF->getOneRowElemNum(i);
 		m_isBoundary[i] = (numAdjV != numAdjF);
 		if (numAdjV != numAdjF)
 		{
@@ -402,9 +402,9 @@ glm::vec3 Mesh::getOneVertex(uint index) const
 bool Mesh::isFaceContainVertex(uint fIndex, uint vIndex) const
 {
 	int v0, v1, v2;
-	v0 = m_faceIndex[(fIndex - 1) * 3];
-	v1 = m_faceIndex[(fIndex - 1) * 3 + 1];
-	v2 = m_faceIndex[(fIndex - 1) * 3 + 2];
+	v0 = m_faceIndex[fIndex * 3];
+	v1 = m_faceIndex[fIndex * 3 + 1];
+	v2 = m_faceIndex[fIndex * 3 + 2];
 
 	return (v0 == vIndex) || (v1 == vIndex) || (v2 == vIndex);
 }

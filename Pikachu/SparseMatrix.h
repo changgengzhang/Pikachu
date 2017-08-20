@@ -28,8 +28,11 @@ public:
 	uint get(int row, int col) const;
 	SparseMatrix<T>& set(T value, int row, int col);
 	bool isExist(int row, int col) const;
-	const QVector<T> getRowValue(int row) const;
-	uint getRowElemNum(int row) const;
+
+	const QVector<T> getOneRowValue(int row) const;
+	uint getOneRowElemNum(int row) const;
+
+	const QVector<T> getOneRowColIndex(int row) const;
 
 	// ======== print ============
 	void printMatrix() const;

@@ -157,7 +157,7 @@ bool SparseMatrix<T>::isExist(int row, int col) const
 
 
 template<typename T>
-const QVector<T> SparseMatrix<T>::getRowValue(int row) const
+const QVector<T> SparseMatrix<T>::getOneRowValue(int row) const
 {
 	this->validateCoordinates(row, m_numCols - 1);
 
@@ -175,10 +175,28 @@ const QVector<T> SparseMatrix<T>::getRowValue(int row) const
 
 
 template<typename T>
-uint SparseMatrix<T>::getRowElemNum(int row) const
+uint SparseMatrix<T>::getOneRowElemNum(int row) const
 {
-	return this->getRowValue(row).count();
+	return this->getOneRowValue(row).count();
 }
+
+
+template<typename T>
+QVector<T> const SparseMatrix<T>::getOneRowColIndex(int row) const
+{
+	this->validateCoordinates(row, m_numCols - 1);
+	QVector<T> rowColIndex;
+	T colIndex;
+	int pos = m_rowPtr.at(row);
+
+	for (; pos < m_rowPtr.at(row + 1); pos++)
+	{
+		colIndex = m_colIndex.at(pos);
+		rowColIndex.append(colIndex);
+	}
+	return rowColIndex;
+}
+
 
 // ===================  assistant function ==============
 
