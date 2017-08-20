@@ -24,7 +24,7 @@ void RenderView::initializeGL()
 	glClearColor(1.0f, 1.0f, 1.0f, 1);
 
 	m_modelMat = glm::mat4(1.0f);
-	m_viewMat = glm::lookAt(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	m_viewMat = glm::lookAt(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	m_projMat = glm::perspective(glm::radians(45.0f), m_scrWidth / m_scrWidth, 0.01f, 100.0f);
 
 }

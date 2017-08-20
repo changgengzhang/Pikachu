@@ -38,8 +38,6 @@ public:
 	const float* getVertexNormal() const;
 	const float* getFaceNormal() const;
 
-	const glm::vec3 getMeshCenter() const;
-
 private:
 	// ======== prase molde file to mesh ============
 	bool parseMeshFromObjFile(QString fileName);
@@ -68,6 +66,7 @@ private:
 	float *m_vertexPos;
 	float *m_originalPos;
 	float *m_vertexNormal;
+	float *m_textureCoordinate;
 	uint *m_faceIndex;
 	uint *m_dualFaceIndex;
 	float *m_faceNormal;
@@ -77,7 +76,6 @@ private:
 	float *m_color;
 
 	// ============ value for unit box ============
-	glm::vec3 m_meshCenter;
 	glm::vec3 m_maxCoord;
 	glm::vec3 m_minCoord;
 

@@ -10,7 +10,6 @@ Mesh::Mesh()
 	m_vertexCount = 0;
 	m_faceCount = 0;
 
-	m_meshCenter = glm::vec3(0.0f);
 	m_maxCoord = glm::vec3(std::numeric_limits<float>::min());
 	m_minCoord = glm::vec3(std::numeric_limits<float>::max());
 	
@@ -74,26 +73,28 @@ bool Mesh::parseMeshFromObjFile(QString fileName)
 	}
 	QTextStream stream(&file);
 
-	QString line;
+	QString line, dataType;
 	QStringList tokens, tokens2;
 	QVector<float> vlist;
 	QVector<uint> flist;
 	while (stream.readLineInto(&line))
 	{
 		tokens = line.split(QRegExp("\\s"));
-		if (tokens.first().toLower() == "v")
+
+		dataType = tokens.first().toLower();
+
+		if (dataType == "v")
 		{
 			vlist.append(tokens.at(1).toFloat());
 			vlist.append(tokens.at(2).toFloat());
 			vlist.append(tokens.at(3).toFloat());
 		}
-		else if (tokens.first().toLower() == "f")
+		else if (dataType == "f")
 		{
 			for (int i = 1; i < tokens.count(); i++)
 			{
 				tokens2 = tokens.at(i).split("/");
-				// the face index of obj format file is start from one, however in OpenGL the index musr strt form zero
-				// while use glDrawElements
+				// the face index of obj format file is start from one, however in OpenGL the index musr strt form zero while use glDrawElements
 				flist.append(tokens2.at(0).toUInt() - 1);
 			}
 		}
@@ -113,7 +114,8 @@ void Mesh::initMeshValue(QVector<float> &vlist, QVector<uint> &flist)
 	m_vertexPos = new float[m_vertexCount * 3];
 	m_originalPos = new float[m_vertexCount * 3];
 	m_vertexNormal = new float[m_vertexCount * 3];
-
+	m_textureCoordinate = new float[m_vertexCount * 2];
+	
 	m_faceIndex = new uint[m_faceCount * 3];
 	m_faceNormal = new float[m_faceCount * 3];
 	m_dualVertexPos = new float[m_faceCount * 3];
@@ -152,9 +154,10 @@ void Mesh::initMeshValue(QVector<float> &vlist, QVector<uint> &flist)
 	this->scaleToUnitBox();
 	this->moveToCenter();
 	this->computeNormal();
-	this->buildAdjacentVV();
+	/*this->buildAdjacentVV();
 	this->buildAdjacentVF();
 	this->buildAdjacentFF();
+	this->findBoundaryVertex();*/
 
 	// m_adjacentVV->printMatrix();
 	// m_adjacentVF->printMatrix();
@@ -183,8 +186,12 @@ void Mesh::scaleToUnitBox()
 // do not take the center as the center of view coordinate
 void Mesh::moveToCenter()
 {
-	glm::vec3 center = (this->computeMaxCoord() - this->computeMinCoord()) / 2.0f;
-	m_meshCenter = center;
+	glm::vec3 maxCoord = this->computeMaxCoord();
+	glm::vec3 minCoord = this->computeMinCoord();
+	//glm::vec3 boxCenter = (maxCoord - minCoord) / 2.0f;
+	//glm::vec3 viewCenter = (maxCoord + minCoord) / 2.0f;;
+	//glm::vec3 center = boxCenter + viewCenter;
+	glm::vec3 center = maxCoord;
 
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
@@ -361,7 +368,7 @@ const glm::vec3  Mesh::computeMaxCoord() const
 
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
-		vertex = glm::vec3(m_vertexPos[i * 3], m_vertexPos[i * 3 + 1], m_vertexPos[i * 3 + 1]);
+		vertex = glm::vec3(m_vertexPos[i * 3], m_vertexPos[i * 3 + 1], m_vertexPos[i * 3 + 2]);
 		maxCoord = glm::vec3(
 			vertex.x > maxCoord.x ? vertex.x : maxCoord.x,
 			vertex.y > maxCoord.y ? vertex.y : maxCoord.y,
@@ -380,7 +387,7 @@ const glm::vec3 Mesh::computeMinCoord() const
 
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
-		vertex = glm::vec3(m_vertexPos[i * 3], m_vertexPos[i * 3 + 1], m_vertexPos[i * 3 + 1]);
+		vertex = glm::vec3(m_vertexPos[i * 3], m_vertexPos[i * 3 + 1], m_vertexPos[i * 3 + 2]);
 		minCoord = glm::vec3(
 			vertex.x < minCoord.x ? vertex.x : minCoord.x,
 			vertex.y < minCoord.y ? vertex.y : minCoord.y,
@@ -451,10 +458,6 @@ const float* Mesh::getFaceNormal() const
 	return m_faceNormal;
 }
 
-const glm::vec3 Mesh::getMeshCenter() const
-{
-	return m_meshCenter;
-}
 
 
 // ============= for test ================

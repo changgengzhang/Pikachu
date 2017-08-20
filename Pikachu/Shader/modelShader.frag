@@ -1,10 +1,14 @@
 #version 330 core
 
-in vec4 vertPosition;
+in VSOUT
+{
+	vec4 position;
+	vec2 textCoord;
+}fsIn;
 
 out vec4 fragColor;
 
 void main()
 {
-    fragColor = normalize(vertPosition) + 0.5;
+    fragColor = normalize(fsIn.position) + 0.5;
 } 

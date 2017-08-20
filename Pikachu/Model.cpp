@@ -197,8 +197,7 @@ void Model::setUniformValue()
 {
 	m_shaderProgram->bind();
 
-	glUniformMatrix4fv(m_modelMatLoc, 1, GL_FALSE, glm::value_ptr(glm::translate(m_modelMat, m_mesh->getMeshCenter())));
-	//glUniformMatrix4fv(m_modelMatLoc, 1, GL_FALSE, glm::value_ptr(m_modelMat));
+	glUniformMatrix4fv(m_modelMatLoc, 1, GL_FALSE, glm::value_ptr(m_modelMat));
 	glUniformMatrix4fv(m_viewMatLoc, 1, GL_FALSE, glm::value_ptr(m_viewMat));
 	glUniformMatrix4fv(m_projMatLoc, 1, GL_FALSE, glm::value_ptr(m_projMat));
 
