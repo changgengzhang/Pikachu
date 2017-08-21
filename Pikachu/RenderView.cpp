@@ -36,6 +36,7 @@ void RenderView::paintGL()
 	// set MVP model
 	if (m_model->isModelLoaded())
 	{
+		m_modelMat = m_model->m_arcball->getModelMatrix(m_viewMat);
 		m_model->setModelMatValue(m_modelMat);
 		m_model->setViewMatValue(m_viewMat);
 		m_model->setProjMatValue(m_projMat);
@@ -54,19 +55,51 @@ void RenderView::resizeGL(int width, int height)
 	m_projMat = glm::perspective(45.0f, RenderViewWidth / RenderViewHeight, 0.01f, 100.0f);
 }
 
+
 void RenderView::mousePressEvent(QMouseEvent *mouseEvent)
 {
+	float x = mouseEvent->x();
+	float y = mouseEvent->y();
 
+	if (mouseEvent->button() == Qt::LeftButton)
+	{
+		if (m_model->isModelLoaded())
+		{
+			m_model->m_arcball->mousePressCallback(Qt::LeftButton, x, y);
+			update();
+		}
+	}
+	else if (mouseEvent->button() == Qt::RightButton)
+	{
+		if (m_model->isModelLoaded())
+		{
+			m_model->m_arcball->mousePressCallback(Qt::RightButton, x, y);
+			update();
+		}
+	}
+	
 }
+
 
 void RenderView::mouseReleaseEvent(QMouseEvent *mouseEvent)
 {
-
+	if (m_model->isModelLoaded())
+	{
+		m_model->m_arcball->mouseReleaseCallback();
+		update();
+	}
 }
+
 
 void RenderView::mouseMoveEvent(QMouseEvent *mouseEvent)
 {
-
+	float x = mouseEvent->x();
+	float y = mouseEvent->y();
+	if (m_model->isModelLoaded())
+	{
+		m_model->m_arcball->mouseMoveCallback(x, y);
+		update();
+	}
 }
 
 

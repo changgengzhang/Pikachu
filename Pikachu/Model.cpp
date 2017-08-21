@@ -8,7 +8,7 @@ Model::Model(QWidget *parent)
 
 	m_mesh = nullptr;
 	m_shaderProgram = nullptr;
-	m_arcBall = nullptr;
+	m_arcball = nullptr;
 }
 
 
@@ -117,9 +117,10 @@ void Model::buildVAOAndVBO()
 
 	// can draw
 	m_isModelLoaded = true;
+	
 
-	// ============= initialize Arc ball ============
-	m_arcBall = new ArcBall(RenderViewWidth, RenderViewHeight, 0.1f);
+	// =========== initalize arcball =======
+	m_arcball = new ArcBall(RenderViewWidth, RenderViewWidth, 0.1f);
 }
 
 void Model::draw()

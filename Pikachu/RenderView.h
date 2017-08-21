@@ -10,6 +10,7 @@
 #include <qevent.h>
 
 #include "Model.h"
+#include "ArcBall.h"
 #include "Util.h"
 using namespace zcg;
 

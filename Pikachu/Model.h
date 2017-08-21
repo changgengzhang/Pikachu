@@ -50,6 +50,9 @@ public:
 	// ======== helper =====================
 	void delModel();
 
+	// ========= arcball ================
+	ArcBall *m_arcball;
+
 private:
 	// ========= tools functions ============	
 	void getUniformLoc();
@@ -76,9 +79,6 @@ private:
 	GLuint m_modelMatLoc;
 	GLuint m_viewMatLoc;
 	GLuint m_projMatLoc;
-
-	// ======= Arc Ball =========
-	ArcBall *m_arcBall;
 
 };
 
