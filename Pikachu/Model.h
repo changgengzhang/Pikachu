@@ -20,6 +20,8 @@
 
 #include "Mesh.h"
 #include "Util.h"
+#include "ArcBall.h"
+using namespace zcg;
 
 class Model : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -74,6 +76,9 @@ private:
 	GLuint m_modelMatLoc;
 	GLuint m_viewMatLoc;
 	GLuint m_projMatLoc;
+
+	// ======= Arc Ball =========
+	ArcBall *m_arcBall;
 
 };
 

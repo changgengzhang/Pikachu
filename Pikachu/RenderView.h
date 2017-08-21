@@ -10,6 +10,9 @@
 #include <qevent.h>
 
 #include "Model.h"
+#include "Util.h"
+using namespace zcg;
+
 
 class RenderView : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -44,8 +47,10 @@ public slots:
 
 private:
 	// ========= viewport ============
-	float m_scrWidth;
-	float m_scrHeight;
+
+	//float m_scrWidth;
+	//float m_scrHeight;
+
 	// ========= MVP matrix ==========
 	glm::mat4 m_modelMat;
 	glm::mat4 m_viewMat;

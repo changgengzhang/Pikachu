@@ -13,6 +13,9 @@ namespace zcg {
 		POINT,
 	};
 
+	const float RenderViewWidth = 1000.0f;
+	const float RenderViewHeight = 800.0f;
+
 	template<typename T> void printArray(char* arrayName,const T *arrayValue, uint arraySize)
 	{
 		QString out;

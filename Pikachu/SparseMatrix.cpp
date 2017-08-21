@@ -177,7 +177,8 @@ const QVector<T> SparseMatrix<T>::getOneRowValue(int row) const
 template<typename T>
 uint SparseMatrix<T>::getOneRowElemNum(int row) const
 {
-	return this->getOneRowValue(row).count();
+	// return this->getOneRowValue(row).count();
+	return m_rowPtr.at(row + 1) - m_rowPtr.at(row);
 }
 
 

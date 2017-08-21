@@ -8,6 +8,7 @@ Model::Model(QWidget *parent)
 
 	m_mesh = nullptr;
 	m_shaderProgram = nullptr;
+	m_arcBall = nullptr;
 }
 
 
@@ -64,6 +65,7 @@ void Model::buildShaderProgram(QString vertexFile, QString fragmentFile)
 	this->getUniformLoc();
 }
 
+// build vao and vbo, and initialize arcballl
 void Model::buildVAOAndVBO()
 {
 	if (m_mesh == nullptr)
@@ -115,6 +117,9 @@ void Model::buildVAOAndVBO()
 
 	// can draw
 	m_isModelLoaded = true;
+
+	// ============= initialize Arc ball ============
+	m_arcBall = new ArcBall(RenderViewWidth, RenderViewHeight, 0.1f);
 }
 
 void Model::draw()

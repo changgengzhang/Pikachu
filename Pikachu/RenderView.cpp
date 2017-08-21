@@ -4,8 +4,8 @@ RenderView::RenderView(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
 	m_model = new Model();
-	m_scrWidth = 1000;
-	m_scrHeight = 800;
+	// m_scrWidth = 1000;
+	// m_scrHeight = 800;
 
 	m_vertexShaderFilePath = "./shader/modelShader.vert";
 	m_fragmentShaderFilePath = "./shader/modelShader.frag";
@@ -20,12 +20,12 @@ void RenderView::initializeGL()
 	connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &RenderView::cleanup);
 	initializeOpenGLFunctions();
 
-	glViewport(0, 0, m_scrWidth, m_scrWidth);
+	glViewport(0, 0, RenderViewWidth, RenderViewHeight);
 	glClearColor(1.0f, 1.0f, 1.0f, 1);
 
 	m_modelMat = glm::mat4(1.0f);
-	m_viewMat = glm::lookAt(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	m_projMat = glm::perspective(glm::radians(45.0f), m_scrWidth / m_scrWidth, 0.01f, 100.0f);
+	m_viewMat = glm::lookAt(glm::vec3(0.0f, 0.0f, 1.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	m_projMat = glm::perspective(glm::radians(45.0f), RenderViewWidth / RenderViewHeight, 0.01f, 100.0f);
 
 }
 
@@ -51,7 +51,7 @@ Sets up the OpenGL viewport, projection, etc. Gets called whenever the widget ha
 void RenderView::resizeGL(int width, int height)
 {
 	m_projMat = glm::mat4(1.0f);
-	m_projMat = glm::perspective(45.0f, m_scrWidth / m_scrHeight, 0.01f, 100.0f);
+	m_projMat = glm::perspective(45.0f, RenderViewWidth / RenderViewHeight, 0.01f, 100.0f);
 }
 
 void RenderView::mousePressEvent(QMouseEvent *mouseEvent)
