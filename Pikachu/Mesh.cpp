@@ -79,7 +79,7 @@ bool Mesh::parseMeshFromObjFile(QString fileName)
 	QVector<uint> flist;
 	while (stream.readLineInto(&line))
 	{
-		tokens = line.split(QRegExp("\\s"));
+		tokens = line.split(QRegExp("\\s+"));
 
 		dataType = tokens.first().toLower();
 
@@ -186,13 +186,9 @@ void Mesh::scaleToUnitBox()
 // do not take the center as the center of view coordinate
 void Mesh::moveToCenter()
 {
-	glm::vec3 maxCoord = this->computeMaxCoord();
-	glm::vec3 minCoord = this->computeMinCoord();
-	//glm::vec3 boxCenter = (maxCoord - minCoord) / 2.0f;
-	//glm::vec3 viewCenter = (maxCoord + minCoord) / 2.0f;;
-	//glm::vec3 center = boxCenter + viewCenter;
-	glm::vec3 center = maxCoord;
+	glm::vec3 center = (this->computeMaxCoord() + this->computeMinCoord()) / 2.0f;
 
+	QString out;
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
 		m_vertexPos[i * 3] -= center.x;
