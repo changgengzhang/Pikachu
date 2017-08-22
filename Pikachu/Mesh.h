@@ -17,6 +17,7 @@
 
 #include "SparseMatrix.h"
 #include "Util.h"
+using namespace zcg;
 
 class Mesh
 {
@@ -42,8 +43,8 @@ private:
 	// ======== prase molde file to mesh ============
 	bool parseMeshFromObjFile(QString fileName);
 
-	// ========= malloc memory for mesh ==============
-	void initMeshValue(QVector<float> &vlist, QVector<uint> &flist);
+	// ========= mesh value initial,eg normal ==============
+	void initMesh();
 
 	// ========== operation to vertex function ==========
 	void scaleToUnitBox();
@@ -63,17 +64,17 @@ private:
 	// ============ values for mesh ==============
 	int m_vertexCount;
 	int m_faceCount; 
-	float *m_vertexPos;
-	float *m_originalPos;
-	float *m_vertexNormal;
-	float *m_textureCoordinate;
-	uint *m_faceIndex;
-	uint *m_dualFaceIndex;
-	float *m_faceNormal;
-	float *m_dualVertexPos;
-	uchar *m_flag;
-	bool *m_isBoundary;
-	float *m_color;
+	QVector<float> m_vertexPos;
+	QVector<float> m_originalPos;
+	QVector<float> m_vertexNormal;
+	QVector<float> m_textureCoordinate;
+	QVector<uint> m_faceIndex;
+	QVector<uint> m_dualFaceIndex;
+	QVector<float> m_faceNormal;
+	QVector<float> m_dualVertexPos;
+	QVector<uchar> m_flag;
+	QVector<bool> m_isBoundary;
+	QVector<float> m_color;
 
 	// ============ value for unit box ============
 	glm::vec3 m_maxCoord;
@@ -84,9 +85,13 @@ private:
 	SparseMatrix<uint>* m_adjacentVF;
 	SparseMatrix<uint>* m_adjacentFF;
 
-	// ============= for test ================
+	// ============= for parametrization ================
 public:
-	void printMemberValue() const;
+	void boundaryVerticesParameterization(ParameterizationType type);
+
+
+private:
+	float m_boundaryLength;
 };
 
 

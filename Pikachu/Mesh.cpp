@@ -20,7 +20,7 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
-	delete[] m_vertexPos;
+	/*delete[] m_vertexPos;
 	delete[] m_originalPos;
 	delete[] m_vertexNormal;
 
@@ -31,7 +31,7 @@ Mesh::~Mesh()
 	delete[] m_flag;
 	delete[] m_isBoundary;
 
-	delete[] m_color;
+	delete[] m_color;*/
 }
 
 
@@ -75,8 +75,7 @@ bool Mesh::parseMeshFromObjFile(QString fileName)
 
 	QString line, dataType;
 	QStringList tokens, tokens2;
-	QVector<float> vlist;
-	QVector<uint> flist;
+	float x, y, z;
 	while (stream.readLineInto(&line))
 	{
 		tokens = line.split(QRegExp("\\s+"));
@@ -85,9 +84,15 @@ bool Mesh::parseMeshFromObjFile(QString fileName)
 
 		if (dataType == "v")
 		{
-			vlist.append(tokens.at(1).toFloat());
-			vlist.append(tokens.at(2).toFloat());
-			vlist.append(tokens.at(3).toFloat());
+			x = tokens.at(1).toFloat();
+			y = tokens.at(2).toFloat();
+			z = tokens.at(3).toFloat();
+			m_vertexPos.append(x);
+			m_vertexPos.append(y);
+			m_vertexPos.append(z);
+			m_originalPos.append(x);
+			m_originalPos.append(y);
+			m_originalPos.append(z);
 		}
 		else if (dataType == "f")
 		{
@@ -95,61 +100,23 @@ bool Mesh::parseMeshFromObjFile(QString fileName)
 			{
 				tokens2 = tokens.at(i).split("/");
 				// the face index of obj format file is start from one, however in OpenGL the index musr strt form zero while use glDrawElements
-				flist.append(tokens2.at(0).toUInt() - 1);
+				m_faceIndex.append(tokens2.at(0).toUInt() - 1);
 			}
 		}
 	}
+	
+	this->initMesh();
 
-	this->initMeshValue(vlist, flist);
 	return true;
 }
 
 
 // ========= malloc memory for mesh ==============
-void Mesh::initMeshValue(QVector<float> &vlist, QVector<uint> &flist)
+void Mesh::initMesh()
 {
-	m_vertexCount = vlist.count() / 3;
-	m_faceCount = flist.count() / 3;
+	m_vertexCount = m_vertexPos.count() / 3;
+	m_faceCount = m_faceIndex.count() / 3;
 
-	m_vertexPos = new float[m_vertexCount * 3];
-	m_originalPos = new float[m_vertexCount * 3];
-	m_vertexNormal = new float[m_vertexCount * 3];
-	m_textureCoordinate = new float[m_vertexCount * 2];
-	
-	m_faceIndex = new uint[m_faceCount * 3];
-	m_faceNormal = new float[m_faceCount * 3];
-	m_dualVertexPos = new float[m_faceCount * 3];
-
-	m_flag = new uchar[m_vertexCount];
-	m_isBoundary = new bool[m_vertexCount];
-
-	m_color = new float[m_faceCount];
-
-	float x, y, z;
-	for (uint i = 0; i < m_vertexCount; i++)
-	{
-		x = vlist[i * 3];
-		y = vlist[i * 3 + 1];
-		z = vlist[i * 3 + 2];
-
-		m_vertexPos[i * 3] = x;
-		m_vertexPos[i * 3 + 1] = y;
-		m_vertexPos[i * 3 + 2] = z;
-
-		m_originalPos[i * 3] = x;
-		m_originalPos[i * 3 + 1] = y;
-		m_originalPos[i * 3 + 2] = z;
-	}
-
-	for (uint i = 0; i < m_faceCount; i++)
-	{
-		// triangular face has 3 indices per face
-		// o
-		m_faceIndex[i * 3] = flist[i * 3];
-		m_faceIndex[i * 3 + 1] = flist[i * 3 + 1];
-		m_faceIndex[i * 3 + 2] = flist[i * 3 + 2];
-
-	}
 
 	this->scaleToUnitBox();
 	this->moveToCenter();
@@ -176,7 +143,7 @@ void Mesh::scaleToUnitBox()
 		return;
 	}
 
-	for (uint i = 0; i < m_vertexCount * 3; i++)
+	for (uint i = 0; i < m_vertexPos.count(); i++)
 	{
 		m_vertexPos[i] /= scale;
 	}
@@ -240,17 +207,17 @@ void Mesh::computeNormal()
 		vnormal[v2] += faceNormal * (1.0f / (lenV02 + lenV12));
 
 		faceNormal = glm::normalize(faceNormal);
-		m_faceNormal[i * 3] = faceNormal.x;
-		m_faceNormal[i * 3 + 1] = faceNormal.y;
-		m_faceNormal[i * 3 + 2] = faceNormal.z;
+		m_faceNormal.append(faceNormal.x);
+		m_faceNormal.append(faceNormal.y);
+		m_faceNormal.append(faceNormal.z);
 	}
 
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
 		vnormal[i] = glm::normalize(vnormal[i]);
-		m_vertexNormal[i * 3] = vnormal[i].x;
-		m_vertexNormal[i * 3 + 1] = vnormal[i].y;
-		m_vertexNormal[i * 3 + 2] = vnormal[i].z;
+		m_vertexNormal.append(vnormal[i].x);
+		m_vertexNormal.append(vnormal[i].y);
+		m_vertexNormal.append(vnormal[i].z);
 	}
 
 	delete[] vnormal;
@@ -428,37 +395,50 @@ const int Mesh::getFaceCount() const
 
 const float* Mesh::getVertexPos() const
 {
-	return m_vertexPos;
+	return m_vertexPos.constData();
 }
 
 
 const float* Mesh::getOriginalPos() const
 {
-	return m_originalPos;
+	return m_originalPos.constData();
 }
 
 
 const uint* Mesh::getFaceIndex() const
 {
-	return m_faceIndex;
+	return m_faceIndex.constData();
 }
 
 const float* Mesh::getVertexNormal() const
 {
-	return m_vertexNormal;
+	return m_vertexNormal.constData();
 }
 
 
 const float* Mesh::getFaceNormal() const
 {
-	return m_faceNormal;
+	return m_faceNormal.constData();
 }
 
 
 
-// ============= for test ================
-void Mesh::printMemberValue() const
+// ==================  for parametrization =================
+void Mesh::boundaryVerticesParameterization(ParameterizationType type)
 {
-	zcg::printArray("Vertex Position", m_vertexPos, m_vertexCount * 3);
-	zcg::printArray("Vertex Position", m_vertexPos, m_vertexCount * 3);
+	assert(type == ParameterizationType::BOUNDARY_SQUARE || type == ParameterizationType::BOUNDARY_CIRCLE);
+	m_boundaryLength = 0.0f;
+	switch (type)
+	{
+	case zcg::BOUNDARY_SQUARE:
+
+
+
+		break;
+	case zcg::BOUNDARY_CIRCLE:
+		break;
+	default:
+		break;
+	}
+
 }

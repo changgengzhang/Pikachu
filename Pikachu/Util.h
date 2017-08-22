@@ -13,8 +13,14 @@ namespace zcg {
 		POINT,
 	};
 
-	const float RenderViewWidth = 1000.0f;
-	const float RenderViewHeight = 800.0f;
+	static const float RenderViewWidth = 1000.0f;
+	static const float RenderViewHeight = 800.0f;
+	enum ParameterizationType
+	{
+		BOUNDARY_SQUARE,
+		BOUNDARY_CIRCLE,
+	};
+	
 
 	template<typename T> void printArray(char* arrayName,const T *arrayValue, uint arraySize)
 	{
