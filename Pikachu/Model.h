@@ -39,7 +39,6 @@ public:
 	void draw();
 
 	// ========= set uniform value ===========
-	void setModelMatValue(glm::mat4 modelMat);
 	void setViewMatValue(glm::mat4 viewMat);
 	void setProjMatValue(glm::mat4 projMat);
 	void setPolygonWay(zcg::MeshPolygonWay polygonWay);
@@ -57,6 +56,8 @@ private:
 	// ========= tools functions ============	
 	void getUniformLoc();
 	void setUniformValue();
+
+	void setModelMatValue();
 
 private:
 	// ========== menber value ==============

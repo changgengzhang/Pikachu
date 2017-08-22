@@ -26,7 +26,6 @@ glm::vec3 ArcBall::mapToSphereCoord(float x, float y)
 {
 	glm::vec3 coord(0.0f, 0.0f, 0.0f);
 
-	
 	coord.x = (2 * x - m_windowWidth) / m_adjustCoord;
 	coord.y = -(2 * y - m_windowHeight) / m_adjustCoord;
 
@@ -67,6 +66,7 @@ void ArcBall::mouseMoveCallback(float x, float y)
 {
 	m_currScrCoord = glm::vec2(x, y);
 	glm::vec3 prePosition, currPosition;
+
 	switch (m_mouseButton)
 	{
 	case Qt::NoButton:
@@ -74,7 +74,7 @@ void ArcBall::mouseMoveCallback(float x, float y)
 	case Qt::LeftButton:
 		prePosition = this->mapToSphereCoord(m_preScrCoord.x, m_preScrCoord.y);
 		currPosition = this->mapToSphereCoord(m_currScrCoord.x, m_currScrCoord.y);
-		if (glm::length(m_currScrCoord - m_preScrCoord) < std::numeric_limits<float>::epsilon())
+		if (glm::length(prePosition - currPosition) < std::numeric_limits<float>::epsilon())
 		{
 			m_angle = 0.0f;
 		}

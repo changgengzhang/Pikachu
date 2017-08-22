@@ -36,11 +36,10 @@ void RenderView::paintGL()
 	// set MVP model
 	if (m_model->isModelLoaded())
 	{
-		m_modelMat = m_model->m_arcball->getModelMatrix(m_viewMat);
-		m_model->setModelMatValue(m_modelMat);
 		m_model->setViewMatValue(m_viewMat);
 		m_model->setProjMatValue(m_projMat);
-
+		//m_model->setModelMatValue(m_modelMat);
+		
 		m_model->draw();
 	}
 

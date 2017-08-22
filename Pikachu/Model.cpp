@@ -131,11 +131,14 @@ void Model::draw()
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEBUG_OUTPUT);
 
+	// model matrix manage by arcball. One model has one arcball
+	this->setModelMatValue();
 	// set uniform value
 	this->setUniformValue();
 
 	m_shaderProgram->bind();
 	m_vao.bind();
+	
 	// draw mode
 	switch (m_polygonWay)
 	{
@@ -163,10 +166,11 @@ void Model::draw()
 	m_shaderProgram->release();
 }
 
+
 // ========= set uniform value ===========
-void Model::setModelMatValue(glm::mat4 modelMat)
+void Model::setModelMatValue()
 {
-	m_modelMat = modelMat;
+	m_modelMat = m_arcball->getModelMatrix(m_viewMat);
 }
 
 
@@ -243,5 +247,11 @@ void Model::delModel()
 	if (m_vbo.isCreated())
 	{
 		m_vbo.destroy();
+	}
+
+	if (m_arcball != nullptr)
+	{
+		delete m_arcball;
+		m_arcball = nullptr;
 	}
 }
