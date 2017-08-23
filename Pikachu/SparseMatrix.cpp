@@ -58,7 +58,7 @@ int SparseMatrix<T>::getNonzeroCount() const
 // =================== set get exist value ==============
 
 template<typename T>
-uint SparseMatrix<T>::get(int row, int col) const
+T SparseMatrix<T>::get(int row, int col) const
 {
 	this->validateCoordinates(row, col);
 
