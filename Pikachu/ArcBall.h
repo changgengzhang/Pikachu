@@ -11,9 +11,8 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-class ArcBall : public QObject
+class ArcBall
 {
-	Q_OBJECT
 public:
 	ArcBall(float windowWidth, float windowHeight, float mouseSensitivity);
 	~ArcBall();

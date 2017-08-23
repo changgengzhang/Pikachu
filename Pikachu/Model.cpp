@@ -128,7 +128,7 @@ void Model::draw()
 	makeCurrent();
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glEnable(GL_DEBUG_OUTPUT);
 
 	// model matrix manage by arcball. One model has one arcball
