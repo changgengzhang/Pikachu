@@ -17,6 +17,8 @@
 
 #include "SparseMatrix.h"
 #include "Util.h"
+#include "Parameterization.h"
+
 using namespace zcg;
 
 class Mesh
@@ -42,8 +44,6 @@ public:
 private:
 	// ======== prase molde file to mesh ============
 	bool parseMeshFromObjFile(QString fileName);
-
-	// ========= mesh value initial,eg normal ==============
 	void initMesh();
 
 	// ========== operation to vertex function ==========
@@ -63,35 +63,32 @@ private:
 
 	// ============ values for mesh ==============
 	int m_vertexCount;
-	int m_faceCount; 
+	int m_faceCount;
+	int m_boundaryVertexCount;
 	QVector<float> m_vertexPos;
 	QVector<float> m_originalPos;
 	QVector<float> m_vertexNormal;
 	QVector<float> m_textureCoordinate;
 	QVector<uint> m_faceIndex;
-	QVector<uint> m_dualFaceIndex;
 	QVector<float> m_faceNormal;
-	QVector<float> m_dualVertexPos;
-	QVector<uchar> m_flag;
 	QVector<bool> m_isBoundary;
-	QVector<float> m_color;
 
 	// ============ value for unit box ============
 	glm::vec3 m_maxCoord;
 	glm::vec3 m_minCoord;
 
 	// ============ sparse matrix for vertex-vertex vertex-face face-face =============
-	SparseMatrix<uint>* m_adjacentVV;
-	SparseMatrix<uint>* m_adjacentVF;
-	SparseMatrix<uint>* m_adjacentFF;
+	SparseMatrix<int>* m_adjacentVV;
+	SparseMatrix<int>* m_adjacentVF;
+	SparseMatrix<int>* m_adjacentFF;
 
-	// ============= for parametrization ================
-public:
-	void boundaryVerticesParameterization(ParameterizationType type);
 
+	// =============== parameterization =============
+	Parameterization* m_parameterization;
 
 private:
-	float m_boundaryLength;
+	template<typename T> void printQVector(QVector<T> &v, QString name);
+
 };
 
 

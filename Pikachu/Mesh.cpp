@@ -121,10 +121,13 @@ void Mesh::initMesh()
 	this->scaleToUnitBox();
 	this->moveToCenter();
 	this->computeNormal();
-	/*this->buildAdjacentVV();
+	this->buildAdjacentVV();
 	this->buildAdjacentVF();
 	this->buildAdjacentFF();
-	this->findBoundaryVertex();*/
+	this->findBoundaryVertex();
+
+	m_parameterization = new Parameterization(m_vertexPos, m_faceIndex, m_isBoundary, *m_adjacentVV);
+	m_parameterization->findBoundaryAndInnerVertices();
 
 	// m_adjacentVV->printMatrix();
 	// m_adjacentVF->printMatrix();
@@ -226,7 +229,7 @@ void Mesh::computeNormal()
 // compute vertex-vertex adjacent matrix
 void Mesh::buildAdjacentVV()
 {
-	m_adjacentVV = new SparseMatrix<uint>(m_vertexCount);
+	m_adjacentVV = new SparseMatrix<int>(m_vertexCount);
 
 	int p0, p1, p2;
 	for (uint i = 0; i < m_faceCount; i++)
@@ -235,19 +238,20 @@ void Mesh::buildAdjacentVV()
 		p1 = m_faceIndex[i * 3 + 1];
 		p2 = m_faceIndex[i * 3 + 2];
 
+		// (i, j) = 1 means that there is edge between i and j, the direction is i to j
+		// (i, j) = -1 means that there is edge between i and j, the direction is j to i
 		m_adjacentVV->set(1, p0, p1);
-		m_adjacentVV->set(1, p0, p2);
-		m_adjacentVV->set(1, p1, p0);
 		m_adjacentVV->set(1, p1, p2);
 		m_adjacentVV->set(1, p2, p0);
-		m_adjacentVV->set(1, p2, p1);
-
+		m_adjacentVV->setIfNotExist(-1, p0, p2);
+		m_adjacentVV->setIfNotExist(-1, p2, p1);
+		m_adjacentVV->setIfNotExist(-1, p1, p0);
 	}
 }
 
 void Mesh::buildAdjacentVF()
 {
-	m_adjacentVF = new SparseMatrix<uint>(m_vertexCount, m_faceCount);
+	m_adjacentVF = new SparseMatrix<int>(m_vertexCount, m_faceCount);
 
 	for (uint i = 0; i < m_faceCount; i++)
 	{
@@ -261,10 +265,10 @@ void Mesh::buildAdjacentVF()
 // must build vertex-face matrix before call the function
 void Mesh::buildAdjacentFF()
 {
-	m_adjacentFF = new SparseMatrix<uint>(m_faceCount);
+	m_adjacentFF = new SparseMatrix<int>(m_faceCount);
 	int v0, v1, v2;
 	uint faceIndex;
-	QVector<uint> oneRow;
+	QVector<int> oneRow;
 
 	for (uint i = 0; i < m_faceCount; i++)
 	{
@@ -311,15 +315,14 @@ void Mesh::findBoundaryVertex()
 {
 	int numAdjV, numAdjF;
 
+	m_boundaryVertexCount = 0;
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
 		numAdjV = m_adjacentVV->getOneRowElemNum(i);
 		numAdjF = m_adjacentVF->getOneRowElemNum(i);
-		m_isBoundary[i] = (numAdjV != numAdjF);
-		if (numAdjV != numAdjF)
-		{
-			m_flag[i] = 1;
-		}
+
+		m_isBoundary.append(numAdjV != numAdjF);
+		m_boundaryVertexCount += numAdjV != numAdjF ? 1 : 0;
 	}
 }
 
@@ -423,22 +426,15 @@ const float* Mesh::getFaceNormal() const
 
 
 
-// ==================  for parametrization =================
-void Mesh::boundaryVerticesParameterization(ParameterizationType type)
+template<typename T> void  Mesh::printQVector(QVector<T> &v, QString name)
 {
-	assert(type == ParameterizationType::BOUNDARY_SQUARE || type == ParameterizationType::BOUNDARY_CIRCLE);
-	m_boundaryLength = 0.0f;
-	switch (type)
+	QString out;
+	out += name;
+	out += "\n";
+	for (uint i = 0; i < v.count(); i++)
 	{
-	case zcg::BOUNDARY_SQUARE:
-
-
-
-		break;
-	case zcg::BOUNDARY_CIRCLE:
-		break;
-	default:
-		break;
+		out += v.at(i);
 	}
 
+	qInfo() << out.toStdString().c_str();
 }
