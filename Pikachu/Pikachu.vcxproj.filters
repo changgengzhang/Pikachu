@@ -85,11 +85,14 @@
     <ClCompile Include="ArcBall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ArcBall.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_Parameterization.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ArcBall.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_Parameterization.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Parameterization.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +112,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="ArcBall.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Parameterization.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

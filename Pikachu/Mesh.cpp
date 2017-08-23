@@ -126,12 +126,10 @@ void Mesh::initMesh()
 	this->buildAdjacentFF();
 	this->findBoundaryVertex();
 
-	m_parameterization = new Parameterization(m_vertexPos, m_faceIndex, m_isBoundary, *m_adjacentVV);
+	m_parameterization = new Parameterization(m_vertexPos, m_faceIndex, m_isBoundary, *m_adjacentVV, m_boundaryVertexCount);
 	m_parameterization->findBoundaryAndInnerVertices();
 
-	// m_adjacentVV->printMatrix();
-	// m_adjacentVF->printMatrix();
-	// m_adjacentFF->printMatrix();
+	
 }
 
 
@@ -320,7 +318,6 @@ void Mesh::findBoundaryVertex()
 	{
 		numAdjV = m_adjacentVV->getOneRowElemNum(i);
 		numAdjF = m_adjacentVF->getOneRowElemNum(i);
-
 		m_isBoundary.append(numAdjV != numAdjF);
 		m_boundaryVertexCount += numAdjV != numAdjF ? 1 : 0;
 	}
@@ -381,7 +378,6 @@ bool Mesh::isFaceContainVertex(uint fIndex, uint vIndex) const
 
 	return (v0 == vIndex) || (v1 == vIndex) || (v2 == vIndex);
 }
-
 
 // ========= get value ===================
 const int Mesh::getVertexCount() const

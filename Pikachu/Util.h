@@ -21,17 +21,13 @@ namespace zcg {
 		BOUNDARY_CIRCLE,
 	};
 	
-
-	template<typename T> void printArray(char* arrayName,const T *arrayValue, uint arraySize)
+	template<typename T> void releaseQVector(QVector<T> &v)
 	{
-		QString out;
-		for (uint i = 0; i < arraySize; i++)
-		{
-			out += arrayValue[i];
-		}
+		v.clear();
+		v.squeeze();
 	}
 
-	template<uint> void printArray(char* arrayName, const uint *arrayValue, uint arraySize);
+//	template<typename T> void releaseQVector(QVector<uint> &v);
 
 }
 
