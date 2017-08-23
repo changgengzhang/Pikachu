@@ -27,6 +27,7 @@ public:
 	// ======== set get exist value =====================
 	uint get(int row, int col) const;
 	SparseMatrix<T>& set(T value, int row, int col);
+	SparseMatrix<T>& setIfNotExist(T value, int row, int col);
 	bool isExist(int row, int col) const;
 
 	const QVector<T> getOneRowValue(int row) const;

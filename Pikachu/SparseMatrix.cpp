@@ -131,6 +131,39 @@ SparseMatrix<T>& SparseMatrix<T>::set(T value, int row, int col)
 	return *this;
 }
 
+
+template<typename T>
+SparseMatrix<T>& SparseMatrix<T>::setIfNotExist(T value, int row, int col)
+{
+	this->validateCoordinates(row, col);
+
+	int currCol = -1;
+	int pos = m_rowPtr.at(row);
+
+	for (; pos < m_rowPtr.at(row + 1); pos++)
+	{
+		currCol = m_colIndex.at(pos);
+		if (currCol >= col)
+		{
+			break;
+		}
+	}
+
+	if (currCol != col)
+	{
+		m_value.insert(m_value.begin() + pos, value);
+		m_colIndex.insert(m_colIndex.begin() + pos, col);
+
+		// update row ptr
+		for (int i = row + 1; i < m_numRows + 1; i++)
+		{
+			m_rowPtr[i] += 1;
+		}
+	}
+	return *this;
+}
+
+
 template<typename T>
 bool SparseMatrix<T>::isExist(int row, int col) const
 {
@@ -267,4 +300,4 @@ void SparseMatrix<T>::printMatrix() const
 
 
 // ==================== explicit instantiations  ===========================
-template class SparseMatrix<uint>;
+template class SparseMatrix<int>;
