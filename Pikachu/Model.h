@@ -9,10 +9,6 @@
 #include <qopengl.h>
 #include <qstring.h>
 #include <qdebug.h>
-// ASSIMP library for load object
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 // glm 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>

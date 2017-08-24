@@ -15,10 +15,12 @@ namespace zcg {
 
 	static const float RenderViewWidth = 1000.0f;
 	static const float RenderViewHeight = 800.0f;
-	enum ParameterizationType
+	enum ParameterizedType
 	{
 		BOUNDARY_SQUARE,
 		BOUNDARY_CIRCLE,
+		INNER_AVERAGE,
+		INNER_SHAP_PRESERVING
 	};
 	
 	template<typename T> void releaseQVector(QVector<T> &v)

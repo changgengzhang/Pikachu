@@ -8,8 +8,6 @@
 #include <qtextstream.h>
 #include <qregexp.h>
 
-// Assimp
-#include <assimp/scene.h>
 // glm
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>

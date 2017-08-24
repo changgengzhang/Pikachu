@@ -142,26 +142,27 @@ void Model::draw()
 	// draw mode
 	switch (m_polygonWay)
 	{
-	case zcg::NONE:
+	case MeshPolygonWay::NONE:
 		break;
-	case zcg::FILL:
+	case MeshPolygonWay::FILL:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
 		break;
-	case zcg::LINE:
+	case MeshPolygonWay::LINE:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
 		break;
-	case zcg::POINT:
+	case MeshPolygonWay::POINT:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
 		break;
 	default:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
 		break;
 	}
 
+	if (m_polygonWay != MeshPolygonWay::NONE)
+	{
+		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
+	}
+	
 	m_vao.release();
 	m_shaderProgram->release();
 }

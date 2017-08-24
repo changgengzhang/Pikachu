@@ -1,10 +1,18 @@
 #ifndef PARAMETERIZATION_H
 #define PARAMETERIZATION_H
 
+// =========== Qt =============
 #include <QObject>
 #include <qvector.h>
 #include <qdebug.h>
 #include <qmath.h>
+#include <qstring.h>
+// glm
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+
+// =========== Eigen ===========
+#include <Eigen\Dense>
 
 #include "SparseMatrix.h"
 #include "Util.h"
@@ -18,13 +26,15 @@ public:
 	Parameterization(const QVector<float> &vertexPos, const QVector<uint> &faceIndex, 
 					const QVector<bool> &isBoundary, const SparseMatrix<int> &adjacentVV, const int boundaryVertexCount);
 	~Parameterization();
-	
+	void calculate(ParameterizedType boundaryType);
+
 
 private:
 	// ========== function =============
 	void findBoundaryAndInnerVertices();
-	void boundaryVerticesParameterize(ParameterizationType boundaryType);
-	void calculateBoundaryLength();
+	void boundaryVerticesParameterize(ParameterizedType boundaryType);
+	void innerVerticesParameterize(ParameterizedType innerType);
+
 
 	// ========= values ===============
 	int m_vertexCount;
@@ -42,7 +52,6 @@ private:
 	QVector<uint> m_boundaryVertexIndex;
 	QVector<float> m_boundaryVerticesResult;
 	QVector<uint> m_innerVertexIndex;
-	QVector<float> m_boundaryWeight;
 
 };
 
