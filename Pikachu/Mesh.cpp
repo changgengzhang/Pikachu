@@ -78,8 +78,8 @@ bool Mesh::parseMeshFromObjFile(QString fileName)
 	float x, y, z;
 	while (stream.readLineInto(&line))
 	{
+		line = line.trimmed();		// remove the leading and trailing space
 		tokens = line.split(QRegExp("\\s+"));
-
 		dataType = tokens.first().toLower();
 
 		if (dataType == "v")

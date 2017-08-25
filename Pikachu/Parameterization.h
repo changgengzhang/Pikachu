@@ -7,6 +7,9 @@
 #include <qdebug.h>
 #include <qmath.h>
 #include <qstring.h>
+#include <qfile.h>
+#include <qtextstream.h>
+
 // glm
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
@@ -28,13 +31,13 @@ public:
 	~Parameterization();
 	void calculate(ParameterizedType boundaryType);
 
-
 private:
 	// ========== function =============
 	void findBoundaryAndInnerVertices();
 	void boundaryVerticesParameterize(ParameterizedType boundaryType);
 	void innerVerticesParameterize(ParameterizedType innerType);
-
+	void mergeBoundaryAndInnerParameterizedResult();
+	void dumpToObjeFile();
 
 	// ========= values ===============
 	int m_vertexCount;
@@ -42,16 +45,18 @@ private:
 	int m_boundaryVertexCount;
 	float m_boundaryLength;
 
-
 	const QVector<float> &m_vertexPos;
 	const QVector<uint> &m_faceIndex;
 	const QVector<bool> &m_isBoundary;
 	const SparseMatrix<int> &m_adjacentVV;
 
-
-	QVector<uint> m_boundaryVertexIndex;
+	QVector<uint> m_boundaryVertexIndices;
 	QVector<float> m_boundaryVerticesResult;
-	QVector<uint> m_innerVertexIndex;
+	QVector<uint> m_innerVertexIndices;
+	QVector<float> m_innerVerticesResult;
+	QVector<float> m_parameterizedResult;
+
+	QString m_dumpFileName;
 
 };
 

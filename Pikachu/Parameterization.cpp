@@ -5,7 +5,7 @@ Parameterization::Parameterization(const QVector<float> &vertexPos, const QVecto
 	: m_vertexPos(vertexPos), m_faceIndex(faceIndex), m_isBoundary(isBoundary), m_adjacentVV(adjacentVV), m_boundaryVertexCount(boundaryVertexCount)
 {
 	m_vertexCount = m_vertexPos.count() / 3;
-
+	m_faceCount = m_faceIndex.count() / 3;
 }
 
 Parameterization::~Parameterization()
@@ -17,7 +17,10 @@ void Parameterization::calculate(ParameterizedType boundaryType)
 {
 	this->findBoundaryAndInnerVertices();
 	this->boundaryVerticesParameterize(boundaryType);
+	//this->innerVerticesParameterize(ParameterizedType::INNER_SHAP_PRESERVING);
 	this->innerVerticesParameterize(ParameterizedType::INNER_AVERAGE);
+	this->mergeBoundaryAndInnerParameterizedResult();
+	this->dumpToObjeFile();
 }
 
 
@@ -69,15 +72,15 @@ void Parameterization::findBoundaryAndInnerVertices()
 	
 	for (uint i = 0; i < boundaryVertices.count(); i++)
 	{
-		m_boundaryVertexIndex.append(boundaryVertices.at(i));
+		m_boundaryVertexIndices.append(boundaryVertices.at(i));
 	}
 
 	// ============== Innaer vertices ====================
 	for (uint index = 0; index < m_vertexCount; index++)
 	{
-		if (!m_boundaryVertexIndex.contains(index))
+		if (!m_boundaryVertexIndices.contains(index))
 		{
-			m_innerVertexIndex.append(index);
+			m_innerVertexIndices.append(index);
 		}
 	}
 }
@@ -95,8 +98,8 @@ void Parameterization::boundaryVerticesParameterize(ParameterizedType boundaryTy
 
 	for (int pos = 0; pos < m_boundaryVertexCount; pos++)
 	{
-		current = m_boundaryVertexIndex.at(pos % m_boundaryVertexCount);
-		follow = m_boundaryVertexIndex.at((pos + 1) % m_boundaryVertexCount);
+		current = m_boundaryVertexIndices.at(pos % m_boundaryVertexCount);
+		follow = m_boundaryVertexIndices.at((pos + 1) % m_boundaryVertexCount);
 		distance = qPow(m_vertexPos.at(current * 3) - m_vertexPos.at(follow * 3), 2)
 			+ qPow(m_vertexPos.at(current * 3 + 1) - m_vertexPos.at(follow * 3 + 1), 2)
 			+ qPow(m_vertexPos.at(current * 3 + 2) - m_vertexPos.at(follow * 3 + 2), 2);
@@ -168,8 +171,8 @@ void Parameterization::innerVerticesParameterize(ParameterizedType innerType)
 {
 	assert(innerType == ParameterizedType::INNER_AVERAGE || innerType == ParameterizedType::INNER_SHAP_PRESERVING);
 
-	int innerCount = m_innerVertexIndex.count();
-	int boundaryCount = m_boundaryVertexIndex.count();
+	int innerCount = m_innerVertexIndices.count();
+	int boundaryCount = m_boundaryVertexIndices.count();
 	int totalCount = innerCount + boundaryCount;
 
 	// A*u = b
@@ -188,24 +191,41 @@ void Parameterization::innerVerticesParameterize(ParameterizedType innerType)
 
 	for (int i = 0; i < innerCount; i++)
 	{
-		int vertexIndex = m_innerVertexIndex.at(i);
+		int vertexIndex = m_innerVertexIndices.at(i);
 		int neighborCount = m_adjacentVV.getOneRowElemNum(vertexIndex);
-		QVector<int> neighborVertices = m_adjacentVV.getOneRowColIndex(vertexIndex);
+		QVector<int> neighborVertexIndices = m_adjacentVV.getOneRowColIndex(vertexIndex);
 
-		QVector<float> *myu;
+		QVector<float> matrixCofficient;
 		switch (innerType)
 		{
 		case zcg::INNER_AVERAGE:
 		{
-			myu = new QVector<float>;
 			for (int w = 0; w < neighborCount; w++)
 			{
-				myu->append(1.0f / neighborCount);
+				matrixCofficient.append(1.0f / neighborCount);
 			}
 			break;
 		}
 		case zcg::INNER_SHAP_PRESERVING:
 		{
+			QVector<float> edgeWeight;
+			float totalLength = 0.0f, edgeLenght;
+
+			for (int w = 0; w < neighborCount; w++)
+			{
+				edgeLenght = 1.0f / qSqrt(
+					qPow(m_vertexPos.at(vertexIndex * 3) - m_vertexPos.at(neighborVertexIndices.at(w) * 3), 2)
+					+ qPow(m_vertexPos.at(vertexIndex * 3 + 1) - m_vertexPos.at(neighborVertexIndices.at(w) * 3 + 1), 2)
+					+ qPow(m_vertexPos.at(vertexIndex * 3 + 2) - m_vertexPos.at(neighborVertexIndices.at(w) * 3 + 2), 2));
+
+				edgeWeight.append(edgeLenght);
+				totalLength += edgeLenght;
+			}
+
+			for (int w = 0; w < neighborCount; w++)
+			{
+				matrixCofficient.append(edgeWeight[w] / totalLength);
+			}
 
 			break;
 		}
@@ -217,29 +237,29 @@ void Parameterization::innerVerticesParameterize(ParameterizedType innerType)
 		int index;
 		for (int j = 0; j < neighborCount; j++)
 		{
-			int neighborIndex = neighborVertices.at(j);
+			int neighborIndex = neighborVertexIndices.at(j);
 
 			// 判断这个邻接点是内部点还是边界点
-			index = m_innerVertexIndex.indexOf(neighborIndex);
+			index = m_innerVertexIndices.indexOf(neighborIndex);
 
 			if (index == -1)
 			{
 				// 边界点
-				index = m_boundaryVertexIndex.indexOf(neighborIndex);
+				index = m_boundaryVertexIndices.indexOf(neighborIndex);
 				if (index == -1)
 				{
 					qFatal("Boooooommmmmm");
 				}
 				else
 				{
-					b.x += myu->at(j) * m_boundaryVerticesResult.at(index * 3);
-					b.y += myu->at(j) * m_boundaryVerticesResult.at(index * 3 + 1);
+					b.x += matrixCofficient.at(j) * m_boundaryVerticesResult.at(index * 3);
+					b.y += matrixCofficient.at(j) * m_boundaryVerticesResult.at(index * 3 + 1);
 				}
 			}
 			else
 			{
-				// 内部点
-				matrixA(i, index) = -myu->at(j);
+				// 内部点 叠加？
+				matrixA(i, index) = -matrixCofficient.at(j);
 			}
 		}
 		matrixB(i, 0) = b.x;
@@ -249,40 +269,63 @@ void Parameterization::innerVerticesParameterize(ParameterizedType innerType)
 
 	Eigen::MatrixXf u = matrixA.colPivHouseholderQr().solve(matrixB);
 
+	for (int i = 0; i < u.rows(); i++)
+	{
+		m_innerVerticesResult.append(u(i, 0));
+		m_innerVerticesResult.append(u(i, 1));
+		m_innerVerticesResult.append(0);
+	}
+}
+
+
+void Parameterization::mergeBoundaryAndInnerParameterizedResult()
+{
+	int index;
+	m_parameterizedResult.resize(m_vertexCount * 3);
 	
-	QString tmp;
-
-	for (int i = 0; i < matrixA.size(); i++)
+	for (int i = 0; i < m_boundaryVertexIndices.count(); i++)
 	{
-		if (i % matrixA.cols() == 0)
-		{
-			tmp += "\n";
-		}
-		tmp += QString::number(matrixA.data()[i]);
-		tmp += " ";
+		index = m_boundaryVertexIndices.at(i);
+		m_parameterizedResult[index * 3] = m_boundaryVerticesResult[i * 3];
+		m_parameterizedResult[index * 3 + 1] = m_boundaryVerticesResult[i * 3 + 1];
+		m_parameterizedResult[index * 3 + 1] = m_boundaryVerticesResult[i * 3 + 1];
 	}
-	qInfo() << tmp.toStdString().c_str();
 
-	tmp.clear();
-	for (int i = 0; i < matrixB.size(); i++)
+	for (int i = 0; i < m_innerVertexIndices.count(); i++)
 	{
-		if (i % matrixB.cols() == 0)
-		{
-			tmp += "\n";
-		}
-		tmp += QString::number(matrixB.data()[i]);
-		tmp += " ";
+		index = m_innerVertexIndices.at(i);
+		m_parameterizedResult[index * 3] = m_innerVerticesResult[i * 3];
+		m_parameterizedResult[index * 3 + 1] = m_innerVerticesResult[i * 3 + 1];
+		m_parameterizedResult[index * 3 + 1] = m_innerVerticesResult[i * 3 + 1];
 	}
-	qInfo() << tmp.toStdString().c_str();
+}
 
-	tmp.clear();
-	for (int i = 0; i < u.size(); i += 2)
+
+void Parameterization::dumpToObjeFile()
+{
+	m_dumpFileName = "param.obj";
+	QFile dumpFile(m_dumpFileName);
+	if (!dumpFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
 	{
-		tmp += QString::number(u.data()[i]);
-		tmp += " ";
-		tmp += QString::number(u.data()[i + 1]);
-		tmp += "\n";
+		return;
 	}
+
+	QTextStream dumpStream(&dumpFile);
+
+	dumpStream << "# parameterization result\n";
 	
-	qInfo() << tmp.toStdString().c_str();
+	// vertex
+	for (int i = 0; i < m_vertexCount; i++)
+	{
+		dumpStream << "v " << m_parameterizedResult[i * 3] << " " << m_parameterizedResult[i * 3 + 1] << " " << m_parameterizedResult[i * 3 + 2] << "\n";
+	}
+
+	// face
+	for (int i = 0; i < m_faceCount; i++)
+	{
+		dumpStream << "f " << m_faceIndex[i * 3] + 1 << " " << m_faceIndex[i * 3 + 1] + 1 << " " << m_faceIndex[i * 3 + 2] + 1 << "\n";
+	}
+
+	dumpFile.close();
+
 }
