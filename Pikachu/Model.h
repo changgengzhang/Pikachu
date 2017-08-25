@@ -17,6 +17,7 @@
 #include "Mesh.h"
 #include "Util.h"
 #include "ArcBall.h"
+#include "Parameterization.h"
 using namespace zcg;
 
 class Model : public QOpenGLWidget, protected QOpenGLFunctions
@@ -31,6 +32,7 @@ public:
 	// ========= OpenGL context build function =============
 	bool loadMeshFromFile(QString fileName);
 	void buildShaderProgram(QString vertexFile, QString fragmentFile);
+	void buildMeshParameterization(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType);
 	void buildVAOAndVBO();
 	void draw();
 
@@ -52,17 +54,24 @@ private:
 	// ========= tools functions ============	
 	void getUniformLoc();
 	void setUniformValue();
-
 	void setModelMatValue();
 
 private:
-	// ========== menber value ==============
-	bool m_isModelLoaded;
+	
+	// ========== value ==============
+	// model
 	Mesh* m_mesh;
-	QString m_fileName;
+	bool m_isModelLoaded;
+	QString m_modelFileName;
+	
+	// polygon
 	MeshPolygonType m_polygonWay;
 
-	// ========  shader value ===============
+	// texture
+	Parameterization *m_parameterization;
+	bool m_isTextureLoad;
+
+	// ========  shader ===============
 	QOpenGLShaderProgram *m_shaderProgram;
 	QOpenGLVertexArrayObject m_vao;
 	QOpenGLBuffer m_vbo;

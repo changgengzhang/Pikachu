@@ -1,8 +1,4 @@
 #include "Mesh.h"
-/************************************************************************/
-/*		Assimp has uniform the layout that vertex index start from zero	*/
-/************************************************************************/
-
 
 // =========== construct and destruct =================
 Mesh::Mesh()
@@ -125,10 +121,6 @@ void Mesh::initMesh()
 	this->buildAdjacentVF();
 	this->buildAdjacentFF();
 	this->findBoundaryVertex();
-
-	//m_parameterization = new Parameterization(m_vertexPos, m_faceIndex, m_isBoundary, *m_adjacentVV, m_boundaryVertexCount);
-	//m_parameterization->calculate(ParameterizationBoundaryType::SQUARE, ParameterizationInnerType::AVERAGE);
-
 }
 
 
@@ -149,6 +141,7 @@ void Mesh::scaleToUnitBox()
 	}
 }
 
+
 // this function only means that move the mesh to the center of a unit box.
 // do not take the center as the center of view coordinate
 void Mesh::moveToCenter()
@@ -163,6 +156,7 @@ void Mesh::moveToCenter()
 		m_vertexPos[i * 3 + 2] -= center.z;
 	}
 }
+
 
 // compute face normal and vertex normal, modification from trimesh2
 void Mesh::computeNormal()
@@ -223,6 +217,7 @@ void Mesh::computeNormal()
 	delete[] vnormal;
 }
 
+
 // compute vertex-vertex adjacent matrix
 void Mesh::buildAdjacentVV()
 {
@@ -246,6 +241,7 @@ void Mesh::buildAdjacentVV()
 	}
 }
 
+
 void Mesh::buildAdjacentVF()
 {
 	m_adjacentVF = new SparseMatrix<int>(m_vertexCount, m_faceCount);
@@ -258,6 +254,7 @@ void Mesh::buildAdjacentVF()
 		m_adjacentVF->set(1, m_faceIndex[i * 3 + 2], i);
 	}
 }
+
 
 // must build vertex-face matrix before call the function
 void Mesh::buildAdjacentFF()
@@ -322,6 +319,7 @@ void Mesh::findBoundaryVertex()
 	}
 }
 
+
 // ====================== tool function ================================
 const glm::vec3  Mesh::computeMaxCoord() const
 {
@@ -378,6 +376,7 @@ bool Mesh::isFaceContainVertex(uint fIndex, uint vIndex) const
 	return (v0 == vIndex) || (v1 == vIndex) || (v2 == vIndex);
 }
 
+
 // ========= get value ===================
 const int Mesh::getVertexCount() const
 {
@@ -391,34 +390,67 @@ const int Mesh::getFaceCount() const
 }
 
 
-const float* Mesh::getVertexPos() const
+const int Mesh::getBoundaryVertexCount() const
 {
-	return m_vertexPos.constData();
+	return m_boundaryVertexCount;
+}
+
+const QVector<float>& Mesh::getVertexPos() const
+{
+	return m_vertexPos;
 }
 
 
-const float* Mesh::getOriginalPos() const
+const QVector<float>& Mesh::getOriginalPos() const
 {
-	return m_originalPos.constData();
+	return m_originalPos;
 }
 
 
-const uint* Mesh::getFaceIndex() const
+const QVector<float>& Mesh::getVertexNormal() const
 {
-	return m_faceIndex.constData();
-}
-
-const float* Mesh::getVertexNormal() const
-{
-	return m_vertexNormal.constData();
+	return m_vertexNormal;
 }
 
 
-const float* Mesh::getFaceNormal() const
+const QVector<float>& Mesh::getTextureCoordinate() const
 {
-	return m_faceNormal.constData();
+	return m_textureCoordinate;
 }
 
+
+const QVector<uint>& Mesh::getFaceIndex() const
+{
+	return m_faceIndex;
+}
+
+
+const QVector<float>& Mesh::getFaceNormal() const
+{
+	return m_faceNormal;
+}
+
+
+const QVector<bool>& Mesh::getIsBoundary() const
+{
+	return m_isBoundary;
+}
+
+SparseMatrix<int>* const Mesh::getAdjacentVV() const
+{
+	return m_adjacentVV;
+}
+
+// ========= set value ===============
+void Mesh::setTextureCoordinate(QVector<float> &textureCoord)
+{
+	m_textureCoordinate.clear();
+	for (uint pos = 0; pos < m_vertexCount; pos++)
+	{
+		m_textureCoordinate.append(textureCoord.at(pos * 2));
+		m_textureCoordinate.append(textureCoord.at(pos * 2 + 1));
+	}
+}
 
 
 template<typename T> void  Mesh::printQVector(QVector<T> &v, QString name)

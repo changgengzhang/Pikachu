@@ -19,6 +19,7 @@
 
 #include "SparseMatrix.h"
 #include "Util.h"
+#include "Mesh.h"
 using namespace zcg;
 
 class Parameterization : public QObject
@@ -28,6 +29,8 @@ class Parameterization : public QObject
 public:
 	Parameterization(const QVector<float> &vertexPos, const QVector<uint> &faceIndex, 
 					const QVector<bool> &isBoundary, const SparseMatrix<int> &adjacentVV, const int boundaryVertexCount);
+	//Parameterization(Mesh &mesh);
+
 	~Parameterization();
 	void calculate(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType);
 

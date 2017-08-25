@@ -25,7 +25,7 @@ void Pikachu::buildSlotsAndSignals()
 	connect(m_ui.modelPolygonLineBtn, SIGNAL(stateChanged(int)), this, SLOT(onModelPolygonLineBtnClicked(int)));
 	connect(m_ui.modelPolygonPointBtn, SIGNAL(stateChanged(int)), this, SLOT(onModelPolygonPointBtnClicked(int)));
 	
-	connect(this, SIGNAL(deliverPolygonType(zcg::MeshPolygonWay)), m_ui.renderView, SLOT(acceptPolygonType(zcg::MeshPolygonWay)));
+	connect(this, SIGNAL(deliverPolygonType(MeshPolygonType)), m_ui.renderView, SLOT(acceptPolygonType(MeshPolygonType)));
 }
 
 

@@ -8,6 +8,7 @@ Parameterization::Parameterization(const QVector<float> &vertexPos, const QVecto
 	m_faceCount = m_faceIndex.count() / 3;
 }
 
+
 Parameterization::~Parameterization()
 {
 }

@@ -311,7 +311,7 @@
       </property>
       <widget class="QWidget" name="tab_12">
        <attribute name="title">
-        <string>Boundary</string>
+        <string>Texture</string>
        </attribute>
        <widget class="QPushButton" name="modelTextureDelBtn">
         <property name="geometry">

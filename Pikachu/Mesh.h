@@ -1,5 +1,6 @@
 #ifndef MESH_H
 #define MESH_H
+
 // Qt
 #include <qvector.h>
 #include <qdebug.h>
@@ -33,11 +34,18 @@ public:
 	// ========= get value ===================
 	const int getVertexCount() const;
 	const int getFaceCount() const;
-	const float* getVertexPos() const;
-	const float* getOriginalPos() const;
-	const uint* getFaceIndex() const;
-	const float* getVertexNormal() const;
-	const float* getFaceNormal() const;
+	const int getBoundaryVertexCount() const;
+	const QVector<float>& getVertexPos() const;
+	const QVector<float>& getOriginalPos() const;
+	const QVector<float>& getVertexNormal() const;
+	const QVector<float>& getTextureCoordinate() const;
+	const QVector<uint>& getFaceIndex() const;
+	const QVector<float>& getFaceNormal() const;
+	const QVector<bool>& getIsBoundary() const;
+	SparseMatrix<int>* const getAdjacentVV() const;
+
+	// ========= set value ===============
+	void setTextureCoordinate(QVector<float> &textureCoord);
 
 private:
 	// ======== prase molde file to mesh ============
@@ -79,10 +87,6 @@ private:
 	SparseMatrix<int>* m_adjacentVV;
 	SparseMatrix<int>* m_adjacentVF;
 	SparseMatrix<int>* m_adjacentFF;
-
-
-	// =============== parameterization =============
-	Parameterization* m_parameterization;
 
 private:
 	template<typename T> void printQVector(QVector<T> &v, QString name);

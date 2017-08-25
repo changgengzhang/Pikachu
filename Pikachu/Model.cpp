@@ -4,11 +4,17 @@ Model::Model(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
 	m_isModelLoaded = false;
-	m_polygonWay = zcg::NONE;
+	m_polygonWay = MeshPolygonType::NONE;
+	m_isTextureLoad = false;
+
+	m_arcball = nullptr;
 
 	m_mesh = nullptr;
+
+	m_parameterization = nullptr;
+
 	m_shaderProgram = nullptr;
-	m_arcball = nullptr;
+	
 }
 
 
@@ -60,10 +66,22 @@ void Model::buildShaderProgram(QString vertexFile, QString fragmentFile)
 
 	// link for compile shader
 	m_shaderProgram->link();
-
 	// ==========  get uniform value location ============
 	this->getUniformLoc();
 }
+
+
+void Model::buildMeshParameterization(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType)
+{
+	if (m_parameterization != nullptr)
+	{
+		delete m_parameterization;
+		//m_parameterization = new Parameterization(m_mesh->getVertexPos(), m_mesh->getFaceIndex(), m_mesh->getIsBoundary(),
+			//m_mesh->getAdjacentVV(), m_mesh->getBoundaryVertexCount());
+	}
+
+}
+
 
 // build vao and vbo, and initialize arcballl
 void Model::buildVAOAndVBO()
@@ -100,16 +118,38 @@ void Model::buildVAOAndVBO()
 	m_vbo.bind();
 	
 	m_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-	// memory for vertex position and normal
-	m_vbo.allocate(m_mesh->getVertexCount() * 2 * 3 * sizeof(float));
+
+	// allocate memory for vertex position and normal
+	int unitSize = m_mesh->getVertexCount() * sizeof(float);
+	int offset = 0;
+	if (m_isTextureLoad)
+	{
+		m_vbo.allocate(unitSize * (3 + 3 + 2));
+	}
+	else
+	{
+		m_vbo.allocate(unitSize * (3 + 3 ));
+	}
+
 	// position
 	glEnableVertexAttribArray(0);
-	m_vbo.write(0, m_mesh->getVertexPos(), m_mesh->getVertexCount() * sizeof(float) * 3);
+	m_vbo.write(offset, m_mesh->getVertexPos().constData(), unitSize * 3);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	offset += unitSize * 3;
+
 	// normal
 	glEnableVertexAttribArray(1);
-	m_vbo.write(m_mesh->getVertexCount() * sizeof(float) * 3, m_mesh->getVertexNormal(), m_mesh->getVertexCount() * sizeof(float) * 3);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(m_mesh->getVertexCount() * sizeof(float) * 3));
+	m_vbo.write(offset, m_mesh->getVertexNormal().constData(), unitSize * 3);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(offset));
+	offset += unitSize * 3;
+
+	// texture 
+	if (m_isTextureLoad)
+	{
+		glEnableVertexAttribArray(2);
+		m_vbo.write(offset, m_mesh->getTextureCoordinate().constData(), unitSize * 2);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(offset));
+	}
 
 	m_vbo.release();
 	m_vao.release();
@@ -118,7 +158,6 @@ void Model::buildVAOAndVBO()
 	// can draw
 	m_isModelLoaded = true;
 	
-
 	// =========== initalize arcball =======
 	m_arcball = new ArcBall(RenderViewWidth, RenderViewWidth, 0.1f);
 }
@@ -160,7 +199,7 @@ void Model::draw()
 
 	if (m_polygonWay != MeshPolygonType::NONE)
 	{
-		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
+		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex().constData());
 	}
 	
 	m_vao.release();
@@ -220,7 +259,6 @@ const bool Model::isModelLoaded() const
 {
 	return m_isModelLoaded;
 }
-
 
 // =========== helper function =============
 void Model::delModel()

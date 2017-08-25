@@ -251,8 +251,8 @@ public:
 
         tabWidget_4->setCurrentIndex(0);
         bgOperationTab->setCurrentIndex(0);
-        tabWidget->setCurrentIndex(1);
-        tabWidget_2->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(0);
+        tabWidget_2->setCurrentIndex(0);
         tabWidget_11->setCurrentIndex(0);
         tabWidget_8->setCurrentIndex(0);
         tabWidget_9->setCurrentIndex(0);
@@ -285,7 +285,7 @@ public:
         modelTextureSetBtn->setText(QApplication::translate("PikachuClass", "Set", Q_NULLPTR));
         modelTextureAverageBtn->setText(QApplication::translate("PikachuClass", "Averarge", Q_NULLPTR));
         modelTextureShapPreserveBtn->setText(QApplication::translate("PikachuClass", "Shap Preserve", Q_NULLPTR));
-        tabWidget_11->setTabText(tabWidget_11->indexOf(tab_12), QApplication::translate("PikachuClass", "Boundary", Q_NULLPTR));
+        tabWidget_11->setTabText(tabWidget_11->indexOf(tab_12), QApplication::translate("PikachuClass", "Texture", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("PikachuClass", "    Model    ", Q_NULLPTR));
         parameterMoelLoadBtn->setText(QApplication::translate("PikachuClass", "Load", Q_NULLPTR));
         parameterShowModelBtn->setText(QApplication::translate("PikachuClass", "Model", Q_NULLPTR));
