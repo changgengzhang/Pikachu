@@ -142,15 +142,15 @@ void Model::draw()
 	// draw mode
 	switch (m_polygonWay)
 	{
-	case MeshPolygonWay::NONE:
+	case MeshPolygonType::NONE:
 		break;
-	case MeshPolygonWay::FILL:
+	case MeshPolygonType::FILL:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		break;
-	case MeshPolygonWay::LINE:
+	case MeshPolygonType::LINE:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		break;
-	case MeshPolygonWay::POINT:
+	case MeshPolygonType::POINT:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 		break;
 	default:
@@ -158,7 +158,7 @@ void Model::draw()
 		break;
 	}
 
-	if (m_polygonWay != MeshPolygonWay::NONE)
+	if (m_polygonWay != MeshPolygonType::NONE)
 	{
 		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex());
 	}
@@ -186,7 +186,7 @@ void Model::setProjMatValue(glm::mat4 projMat)
 	m_projMat = projMat;
 }
 
-void Model::setPolygonWay(zcg::MeshPolygonWay polygonWay)
+void Model::setPolygonWay(MeshPolygonType polygonWay)
 {
 	m_polygonWay = polygonWay;
 }

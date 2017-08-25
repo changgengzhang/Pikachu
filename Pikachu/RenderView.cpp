@@ -134,7 +134,7 @@ void RenderView::onModelDelBtnClicked()
 }
 
 
-void RenderView::acceptPolygonType(zcg::MeshPolygonWay polygonWay)
+void RenderView::acceptPolygonType(MeshPolygonType polygonWay)
 {
 	makeCurrent();
 	m_model->setPolygonWay(polygonWay);

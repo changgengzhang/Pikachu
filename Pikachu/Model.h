@@ -37,7 +37,7 @@ public:
 	// ========= set uniform value ===========
 	void setViewMatValue(glm::mat4 viewMat);
 	void setProjMatValue(glm::mat4 projMat);
-	void setPolygonWay(zcg::MeshPolygonWay polygonWay);
+	void setPolygonWay(MeshPolygonType polygonWay);
 
 	// ======== flags value get =============
 	const bool isModelLoaded() const;
@@ -60,7 +60,7 @@ private:
 	bool m_isModelLoaded;
 	Mesh* m_mesh;
 	QString m_fileName;
-	zcg::MeshPolygonWay m_polygonWay;
+	MeshPolygonType m_polygonWay;
 
 	// ========  shader value ===============
 	QOpenGLShaderProgram *m_shaderProgram;

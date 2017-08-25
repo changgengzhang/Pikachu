@@ -126,8 +126,8 @@ void Mesh::initMesh()
 	this->buildAdjacentFF();
 	this->findBoundaryVertex();
 
-	m_parameterization = new Parameterization(m_vertexPos, m_faceIndex, m_isBoundary, *m_adjacentVV, m_boundaryVertexCount);
-	m_parameterization->calculate(ParameterizedType::BOUNDARY_SQUARE);
+	//m_parameterization = new Parameterization(m_vertexPos, m_faceIndex, m_isBoundary, *m_adjacentVV, m_boundaryVertexCount);
+	//m_parameterization->calculate(ParameterizationBoundaryType::SQUARE, ParameterizationInnerType::AVERAGE);
 
 }
 

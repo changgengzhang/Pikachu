@@ -29,13 +29,13 @@ public:
 	Parameterization(const QVector<float> &vertexPos, const QVector<uint> &faceIndex, 
 					const QVector<bool> &isBoundary, const SparseMatrix<int> &adjacentVV, const int boundaryVertexCount);
 	~Parameterization();
-	void calculate(ParameterizedType boundaryType);
+	void calculate(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType);
 
 private:
 	// ========== function =============
 	void findBoundaryAndInnerVertices();
-	void boundaryVerticesParameterize(ParameterizedType boundaryType);
-	void innerVerticesParameterize(ParameterizedType innerType);
+	void boundaryVerticesParameterize(ParameterizationBoundaryType boundaryType);
+	void innerVerticesParameterize(ParameterizationInnerType innerType);
 	void mergeBoundaryAndInnerParameterizedResult();
 	void dumpToObjeFile();
 

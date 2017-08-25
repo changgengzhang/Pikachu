@@ -13,12 +13,11 @@ Parameterization::~Parameterization()
 }
 
 
-void Parameterization::calculate(ParameterizedType boundaryType)
+void Parameterization::calculate(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType)
 {
 	this->findBoundaryAndInnerVertices();
 	this->boundaryVerticesParameterize(boundaryType);
-	//this->innerVerticesParameterize(ParameterizedType::INNER_SHAP_PRESERVING);
-	this->innerVerticesParameterize(ParameterizedType::INNER_AVERAGE);
+	this->innerVerticesParameterize(innerType);
 	this->mergeBoundaryAndInnerParameterizedResult();
 	this->dumpToObjeFile();
 }
@@ -86,9 +85,9 @@ void Parameterization::findBoundaryAndInnerVertices()
 }
 
 
-void Parameterization::boundaryVerticesParameterize(ParameterizedType boundaryType)
+void Parameterization::boundaryVerticesParameterize(ParameterizationBoundaryType boundaryType)
 {
-	assert(boundaryType == ParameterizedType::BOUNDARY_SQUARE || boundaryType == ParameterizedType::BOUNDARY_CIRCLE);
+	assert(boundaryType == ParameterizationBoundaryType::SQUARE || boundaryType == ParameterizationBoundaryType::CIRCLE);
 	m_boundaryLength = 0.0f;
 	
 	// calculate boundary length and per vertex weight
@@ -117,7 +116,7 @@ void Parameterization::boundaryVerticesParameterize(ParameterizedType boundaryTy
 	// vertex parameterize
 	switch (boundaryType)
 	{
-	case zcg::BOUNDARY_SQUARE:
+	case ParameterizationBoundaryType::SQUARE:
 	{
 		float edgeLenth = 1.0f;
 		for (uint i = 0; i < m_boundaryVertexCount; i++)
@@ -149,7 +148,7 @@ void Parameterization::boundaryVerticesParameterize(ParameterizedType boundaryTy
 		}
 		break;
 	}
-	case zcg::BOUNDARY_CIRCLE:
+	case ParameterizationBoundaryType::CIRCLE:
 	{
 		float radius = 0.5f;
 		float circle = 2 * M_PI;
@@ -167,9 +166,9 @@ void Parameterization::boundaryVerticesParameterize(ParameterizedType boundaryTy
 }
 
 
-void Parameterization::innerVerticesParameterize(ParameterizedType innerType)
+void Parameterization::innerVerticesParameterize(ParameterizationInnerType innerType)
 {
-	assert(innerType == ParameterizedType::INNER_AVERAGE || innerType == ParameterizedType::INNER_SHAP_PRESERVING);
+	assert(innerType == ParameterizationInnerType::AVERAGE || innerType == ParameterizationInnerType::SHAP_PRESERVING);
 
 	int innerCount = m_innerVertexIndices.count();
 	int boundaryCount = m_boundaryVertexIndices.count();
@@ -198,7 +197,7 @@ void Parameterization::innerVerticesParameterize(ParameterizedType innerType)
 		QVector<float> matrixCofficient;
 		switch (innerType)
 		{
-		case zcg::INNER_AVERAGE:
+		case ParameterizationInnerType::AVERAGE:
 		{
 			for (int w = 0; w < neighborCount; w++)
 			{
@@ -206,7 +205,7 @@ void Parameterization::innerVerticesParameterize(ParameterizedType innerType)
 			}
 			break;
 		}
-		case zcg::INNER_SHAP_PRESERVING:
+		case ParameterizationInnerType::SHAP_PRESERVING:
 		{
 			QVector<float> edgeWeight;
 			float totalLength = 0.0f, edgeLenght;
@@ -288,7 +287,7 @@ void Parameterization::mergeBoundaryAndInnerParameterizedResult()
 		index = m_boundaryVertexIndices.at(i);
 		m_parameterizedResult[index * 3] = m_boundaryVerticesResult[i * 3];
 		m_parameterizedResult[index * 3 + 1] = m_boundaryVerticesResult[i * 3 + 1];
-		m_parameterizedResult[index * 3 + 1] = m_boundaryVerticesResult[i * 3 + 1];
+		m_parameterizedResult[index * 3 + 2] = m_boundaryVerticesResult[i * 3 + 2];
 	}
 
 	for (int i = 0; i < m_innerVertexIndices.count(); i++)
@@ -296,7 +295,7 @@ void Parameterization::mergeBoundaryAndInnerParameterizedResult()
 		index = m_innerVertexIndices.at(i);
 		m_parameterizedResult[index * 3] = m_innerVerticesResult[i * 3];
 		m_parameterizedResult[index * 3 + 1] = m_innerVerticesResult[i * 3 + 1];
-		m_parameterizedResult[index * 3 + 1] = m_innerVerticesResult[i * 3 + 1];
+		m_parameterizedResult[index * 3 + 2] = m_innerVerticesResult[i * 3 + 2];
 	}
 }
 
