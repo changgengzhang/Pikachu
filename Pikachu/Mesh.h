@@ -45,7 +45,7 @@ public:
 	SparseMatrix<int>* const getAdjacentVV() const;
 
 	// ========= set value ===============
-	void setTextureCoordinate(QVector<float> &textureCoord);
+	void setTextureCoordinate(const QVector<float> &textureCoord);
 
 private:
 	// ======== prase molde file to mesh ============

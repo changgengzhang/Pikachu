@@ -38,27 +38,28 @@ SparseMatrix<T>::~SparseMatrix()
 
 // ================== priavte values get ===============
 template<typename T>
-int SparseMatrix<T>::getNumRow() const
+const int SparseMatrix<T>::getNumRow() const
 {
 	return m_numRows;
 }
 
+
 template<typename T>
-int SparseMatrix<T>::getNumCol() const
+const int SparseMatrix<T>::getNumCol() const
 {
 	return m_numCols;
 }
 
+
 template<typename T>
-int SparseMatrix<T>::getNonzeroCount() const
+const int SparseMatrix<T>::getNonzeroCount() const
 {
 	return m_numNonzero;
 }
 
-// =================== set get exist value ==============
 
 template<typename T>
-T SparseMatrix<T>::get(int row, int col) const
+const T SparseMatrix<T>::get(int row, int col) const
 {
 	this->validateCoordinates(row, col);
 
@@ -82,7 +83,7 @@ T SparseMatrix<T>::get(int row, int col) const
 }
 
 template<typename T>
-SparseMatrix<T>& SparseMatrix<T>::set(T value, int row, int col)
+const SparseMatrix<T>& SparseMatrix<T>::set(T value, int row, int col)
 {
 	this->validateCoordinates(row, col);
 
@@ -133,7 +134,7 @@ SparseMatrix<T>& SparseMatrix<T>::set(T value, int row, int col)
 
 
 template<typename T>
-SparseMatrix<T>& SparseMatrix<T>::setIfNotExist(T value, int row, int col)
+const SparseMatrix<T>& SparseMatrix<T>::setIfNotExist(T value, int row, int col)
 {
 	this->validateCoordinates(row, col);
 
@@ -165,7 +166,7 @@ SparseMatrix<T>& SparseMatrix<T>::setIfNotExist(T value, int row, int col)
 
 
 template<typename T>
-bool SparseMatrix<T>::isExist(int row, int col) const
+const bool SparseMatrix<T>::isExist(int row, int col) const
 {
 	this->validateCoordinates(row, col);
 
@@ -208,7 +209,7 @@ const QVector<T> SparseMatrix<T>::getOneRowValue(int row) const
 
 
 template<typename T>
-uint SparseMatrix<T>::getOneRowElemNum(int row) const
+const uint SparseMatrix<T>::getOneRowElemNum(int row) const
 {
 	// return this->getOneRowValue(row).count();
 	return m_rowPtr.at(row + 1) - m_rowPtr.at(row);
@@ -216,7 +217,7 @@ uint SparseMatrix<T>::getOneRowElemNum(int row) const
 
 
 template<typename T>
-QVector<T> const SparseMatrix<T>::getOneRowColIndex(int row) const
+const QVector<T> SparseMatrix<T>::getOneRowColIndex(int row) const
 {
 	this->validateCoordinates(row, m_numCols - 1);
 	QVector<T> rowColIndex;

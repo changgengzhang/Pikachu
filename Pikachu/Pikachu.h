@@ -16,23 +16,30 @@ public:
 
 private:
 	Ui::PikachuClass m_ui;
-	MeshPolygonType m_polygonWay;
 
 	// =========== helper function ==========
 	void buildSlotsAndSignals();
 	void initUi();
 
+
 	// =========== signals ==========
 signals:
-	void deliverString(QString filePath);
+	void deliverString(FileType fileType, QString fileName);
 	void deliverPolygonType(MeshPolygonType polygonWay);
+	void deliverParameterizationInnerType(ParameterizationInnerType innerType);
+
 
 	// ============ slots ===========
 private slots:
 	void onModelLoadBtnClicked();
+
 	void onModelPolygonFaceBtnClicked(int state);
 	void onModelPolygonLineBtnClicked(int state);
 	void onModelPolygonPointBtnClicked(int state);
+	
+	void onModelTextureSetBtnClicked();
+	void onModelTextureAverageBtnClicked(int state);
+	void onModelTextureShapPreserveBtnClicked(int state);
 
 };
 

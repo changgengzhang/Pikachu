@@ -1,7 +1,7 @@
 #include "Parameterization.h"
 
 Parameterization::Parameterization(const QVector<float> &vertexPos, const QVector<uint> &faceIndex,
-	const QVector<bool> &isBoundary, const SparseMatrix<int> &adjacentVV, const int boundaryVertexCount)
+	const QVector<bool> &isBoundary, const SparseMatrix<int> *adjacentVV, const int boundaryVertexCount)
 	: m_vertexPos(vertexPos), m_faceIndex(faceIndex), m_isBoundary(isBoundary), m_adjacentVV(adjacentVV), m_boundaryVertexCount(boundaryVertexCount)
 {
 	m_vertexCount = m_vertexPos.count() / 3;
@@ -19,10 +19,43 @@ void Parameterization::calculate(ParameterizationBoundaryType boundaryType, Para
 	this->findBoundaryAndInnerVertices();
 	this->boundaryVerticesParameterize(boundaryType);
 	this->innerVerticesParameterize(innerType);
-	this->mergeBoundaryAndInnerParameterizedResult();
-	this->dumpToObjeFile();
 }
 
+
+void Parameterization::dumpToObjeFile(QString fileName) const
+{
+	QFile dumpFile(fileName);
+	if (!dumpFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+	{
+		return;
+	}
+
+	QTextStream dumpStream(&dumpFile);
+
+	dumpStream << "# parameterization result\n";
+
+	// vertex
+	for (int i = 0; i < m_vertexCount; i++)
+	{
+		dumpStream << "v " << m_parameterizedResult[i * 3] << " " << m_parameterizedResult[i * 3 + 1] << " " << m_parameterizedResult[i * 3 + 2] << "\n";
+	}
+
+	// face
+	for (int i = 0; i < m_faceCount; i++)
+	{
+		dumpStream << "f " << m_faceIndex[i * 3] + 1 << " " << m_faceIndex[i * 3 + 1] + 1 << " " << m_faceIndex[i * 3 + 2] + 1 << "\n";
+	}
+
+	dumpFile.close();
+
+}
+
+
+const QVector<float>& Parameterization::getParameterizedResult(SpatialDimension dimensionType)
+{
+	this->mergeBoundaryAndInnerParameterizedResult(dimensionType);
+	return m_parameterizedResult;
+}
 
 
 void Parameterization::findBoundaryAndInnerVertices()
@@ -49,8 +82,8 @@ void Parameterization::findBoundaryAndInnerVertices()
 	// order the boundary vertex
 	for (int count = 1; count < m_boundaryVertexCount; count++)
 	{
-		adjVVValue = m_adjacentVV.getOneRowValue(currVertexIndex);
-		adjVVIndex = m_adjacentVV.getOneRowColIndex(currVertexIndex);
+		adjVVValue = m_adjacentVV->getOneRowValue(currVertexIndex);
+		adjVVIndex = m_adjacentVV->getOneRowColIndex(currVertexIndex);
 
 		for (uint pos = 0; pos < adjVVValue.count(); pos++)
 		{
@@ -59,7 +92,7 @@ void Parameterization::findBoundaryAndInnerVertices()
 			if (currValue == 1 && !findTag[vertexIndex] && m_isBoundary.at(vertexIndex))
 			{
 				// 如果选中的点有和当前的点之间都有一条指向各自的有向边，那么舍弃这个点。
-				if (m_adjacentVV.get(vertexIndex, currVertexIndex) != 1)
+				if (m_adjacentVV->get(vertexIndex, currVertexIndex) != 1)
 				{
 					currVertexIndex = vertexIndex;
 					boundaryVertices.append(currVertexIndex);
@@ -192,8 +225,8 @@ void Parameterization::innerVerticesParameterize(ParameterizationInnerType inner
 	for (int i = 0; i < innerCount; i++)
 	{
 		int vertexIndex = m_innerVertexIndices.at(i);
-		int neighborCount = m_adjacentVV.getOneRowElemNum(vertexIndex);
-		QVector<int> neighborVertexIndices = m_adjacentVV.getOneRowColIndex(vertexIndex);
+		int neighborCount = m_adjacentVV->getOneRowElemNum(vertexIndex);
+		QVector<int> neighborVertexIndices = m_adjacentVV->getOneRowColIndex(vertexIndex);
 
 		QVector<float> matrixCofficient;
 		switch (innerType)
@@ -278,54 +311,35 @@ void Parameterization::innerVerticesParameterize(ParameterizationInnerType inner
 }
 
 
-void Parameterization::mergeBoundaryAndInnerParameterizedResult()
+void Parameterization::mergeBoundaryAndInnerParameterizedResult(SpatialDimension dimensionType)
 {
-	int index;
-	m_parameterizedResult.resize(m_vertexCount * 3);
+	assert(dimensionType == SpatialDimension::D2 || dimensionType == SpatialDimension::D3);
+	int index, step;
+	step = dimensionType == SpatialDimension::D3 ? 3 : 2;
+
+	m_parameterizedResult.resize(m_vertexCount * step);
+	m_parameterizedResult.squeeze();
 	
 	for (int i = 0; i < m_boundaryVertexIndices.count(); i++)
 	{
 		index = m_boundaryVertexIndices.at(i);
-		m_parameterizedResult[index * 3] = m_boundaryVerticesResult[i * 3];
-		m_parameterizedResult[index * 3 + 1] = m_boundaryVerticesResult[i * 3 + 1];
-		m_parameterizedResult[index * 3 + 2] = m_boundaryVerticesResult[i * 3 + 2];
+		m_parameterizedResult[index * step] = m_boundaryVerticesResult[i * 3];
+		m_parameterizedResult[index * step + 1] = m_boundaryVerticesResult[i * 3 + 1];
+		if (dimensionType == SpatialDimension::D3)
+		{
+			m_parameterizedResult[index * step + 2] = m_boundaryVerticesResult[i * 3 + 2];
+		}	
 	}
 
 	for (int i = 0; i < m_innerVertexIndices.count(); i++)
 	{
 		index = m_innerVertexIndices.at(i);
-		m_parameterizedResult[index * 3] = m_innerVerticesResult[i * 3];
-		m_parameterizedResult[index * 3 + 1] = m_innerVerticesResult[i * 3 + 1];
-		m_parameterizedResult[index * 3 + 2] = m_innerVerticesResult[i * 3 + 2];
+		m_parameterizedResult[index * step] = m_innerVerticesResult[i * 3];
+		m_parameterizedResult[index * step + 1] = m_innerVerticesResult[i * 3 + 1];
+		if (dimensionType == SpatialDimension::D3)
+		{
+			m_parameterizedResult[index * step + 2] = m_innerVerticesResult[i * 3 + 2];
+		}
 	}
 }
 
-
-void Parameterization::dumpToObjeFile()
-{
-	m_dumpFileName = "param.obj";
-	QFile dumpFile(m_dumpFileName);
-	if (!dumpFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
-	{
-		return;
-	}
-
-	QTextStream dumpStream(&dumpFile);
-
-	dumpStream << "# parameterization result\n";
-	
-	// vertex
-	for (int i = 0; i < m_vertexCount; i++)
-	{
-		dumpStream << "v " << m_parameterizedResult[i * 3] << " " << m_parameterizedResult[i * 3 + 1] << " " << m_parameterizedResult[i * 3 + 2] << "\n";
-	}
-
-	// face
-	for (int i = 0; i < m_faceCount; i++)
-	{
-		dumpStream << "f " << m_faceIndex[i * 3] + 1 << " " << m_faceIndex[i * 3 + 1] + 1 << " " << m_faceIndex[i * 3 + 2] + 1 << "\n";
-	}
-
-	dumpFile.close();
-
-}

@@ -442,7 +442,7 @@ SparseMatrix<int>* const Mesh::getAdjacentVV() const
 }
 
 // ========= set value ===============
-void Mesh::setTextureCoordinate(QVector<float> &textureCoord)
+void Mesh::setTextureCoordinate(const QVector<float> &textureCoord)
 {
 	m_textureCoordinate.clear();
 	for (uint pos = 0; pos < m_vertexCount; pos++)

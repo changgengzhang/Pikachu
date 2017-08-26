@@ -20,19 +20,17 @@ public:
 	SparseMatrix<T>& operator = (const SparseMatrix<T> & m);
 	
 	// ========= priavte values get ==============
-	int getNumRow() const;
-	int getNumCol() const;
-	int getNonzeroCount() const;
+	const int getNumRow() const;
+	const int getNumCol() const;
+	const int getNonzeroCount() const;
 
 	// ======== set get exist value =====================
-	T get(int row, int col) const;
-	SparseMatrix<T>& set(T value, int row, int col);
-	SparseMatrix<T>& setIfNotExist(T value, int row, int col);
-	bool isExist(int row, int col) const;
-
+	const T get(int row, int col) const;
+	const SparseMatrix<T>& set(T value, int row, int col);
+	const SparseMatrix<T>& setIfNotExist(T value, int row, int col);
+	const bool isExist(int row, int col) const;
 	const QVector<T> getOneRowValue(int row) const;
-	uint getOneRowElemNum(int row) const;
-
+	const uint getOneRowElemNum(int row) const;
 	const QVector<T> getOneRowColIndex(int row) const;
 
 	// ======== print ============

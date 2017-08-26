@@ -33,25 +33,17 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *mouseEvent) override;
 	void mouseMoveEvent(QMouseEvent *mouseEvent) override;
 
-private:
-	void buildModel();
-
-
 private slots:
 	void cleanup();
 
 public slots: 
-	void acceptFilePath(QString filePath);
 	void onModelDelBtnClicked();
-	void acceptPolygonType(MeshPolygonType polygonWay);
-
+	void onModelTextureDelBtnClicked();
+	void acceptString(FileType fileType, QString fileName);
+	void acceptPolygonType(MeshPolygonType polygonType);
+	void acceptParameterizationInnerType(ParameterizationInnerType innerType);
 
 private:
-	// ========= viewport ============
-
-	//float m_scrWidth;
-	//float m_scrHeight;
-
 	// ========= MVP matrix ==========
 	glm::mat4 m_modelMat;
 	glm::mat4 m_viewMat;
@@ -59,11 +51,15 @@ private:
 
 	// ========= Model ===============
 	Model *m_model;
-	QString m_modelFilePath;
+	QString m_modelFileName;
 
 	// ========= shader file path =========
 	QString m_vertexShaderFilePath;
 	QString m_fragmentShaderFilePath;
+
+	// texture
+	QString m_textureFileName;
+
 };
 
 

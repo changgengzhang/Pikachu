@@ -8,7 +8,9 @@ in VSOUT
 
 out vec4 fragColor;
 
+uniform sampler2D image;
+
 void main()
 {
-    fragColor = normalize(fsIn.position) + 0.5;
+    fragColor = texture(image, fsIn.textCoord);
 } 

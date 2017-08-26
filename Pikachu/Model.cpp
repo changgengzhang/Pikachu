@@ -3,38 +3,77 @@
 Model::Model(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
-	m_isModelLoaded = false;
-	m_polygonWay = MeshPolygonType::NONE;
-	m_isTextureLoad = false;
-
-	m_arcball = nullptr;
-
+	m_canDraw = false;
 	m_mesh = nullptr;
-
+	m_polygonWay = MeshPolygonType::NONE_POLYGON_TYPE;
+	
 	m_parameterization = nullptr;
+	m_hasTexture = false;
+	m_parameterizationInnerType = ParameterizationInnerType::NONE_INNER_TYPE;
 
 	m_shaderProgram = nullptr;
-	
+	m_arcball = nullptr;
 }
 
 
 Model::~Model()
 {
-	this->delModel();
+	this->destoryRender();
+}
+
+
+void Model::buildMesh(QString vertexShaderFile, QString fragmentShaderFile)
+{
+	m_hasTexture = m_parameterizationInnerType != ParameterizationInnerType::NONE_INNER_TYPE && !m_textureFileName.isEmpty();
+
+	this->loadMeshFromFile(m_modelFileName);
+
+	if (m_hasTexture)
+	{
+		this->buildMeshParameterization(ParameterizationBoundaryType::SQUARE, m_parameterizationInnerType);
+	}
+
+	this->buildShaderProgram(vertexShaderFile, fragmentShaderFile);
+
+	this->getUniformLoc();
+
+	this->buildVAOAndVBO();
+
+	if (m_hasTexture)
+	{
+		this->buildTexture(m_textureFileName);
+	}
+
+	// can draw
+	m_canDraw = true;
+
+	// =========== initalize arcball =======
+	m_arcball = new ArcBall(RenderViewWidth, RenderViewWidth, 0.1f);
+}
+
+
+void Model::attachTexture(QString vertexShaderFile, QString fragmentShaderFile)
+{
+	m_hasTexture = m_parameterizationInnerType != ParameterizationInnerType::NONE_INNER_TYPE && !m_textureFileName.isEmpty();
+	if (m_canDraw && m_hasTexture)
+	{
+		this->buildMeshParameterization(ParameterizationBoundaryType::SQUARE, m_parameterizationInnerType);
+		this->buildShaderProgram(vertexShaderFile, fragmentShaderFile);
+		this->getUniformLoc();
+		this->buildVAOAndVBO();
+		this->buildTexture(m_textureFileName);
+	}
 }
 
 
 // ========= OpenGL context build function =============
-bool Model::loadMeshFromFile(QString fileName)
+bool Model::loadMeshFromFile(QString modelFile)
 {
 	// is created
-	if (m_mesh != nullptr)
-	{
-		delete m_mesh;
-	}
-
+	if (m_mesh != nullptr) delete m_mesh;
+	
 	m_mesh = new Mesh();
-	bool ret = m_mesh->buildMesh(fileName);
+	bool ret = m_mesh->buildMesh(modelFile);
 
 	if (ret)
 	{
@@ -51,10 +90,7 @@ bool Model::loadMeshFromFile(QString fileName)
 void Model::buildShaderProgram(QString vertexFile, QString fragmentFile)
 {
 	// is build
-	if (m_shaderProgram != nullptr)
-	{
-		delete m_shaderProgram;
-	}
+	if (m_shaderProgram != nullptr) delete m_shaderProgram;
 
 	makeCurrent();
 	initializeOpenGLFunctions();
@@ -66,37 +102,33 @@ void Model::buildShaderProgram(QString vertexFile, QString fragmentFile)
 
 	// link for compile shader
 	m_shaderProgram->link();
-	// ==========  get uniform value location ============
-	this->getUniformLoc();
 }
 
 
 void Model::buildMeshParameterization(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType)
 {
-	if (m_parameterization != nullptr)
-	{
-		delete m_parameterization;
-		//m_parameterization = new Parameterization(m_mesh->getVertexPos(), m_mesh->getFaceIndex(), m_mesh->getIsBoundary(),
-			//m_mesh->getAdjacentVV(), m_mesh->getBoundaryVertexCount());
-	}
+	if (m_parameterization != nullptr) delete m_parameterization;
 
+	m_parameterization = new Parameterization(
+		m_mesh->getVertexPos(),
+		m_mesh->getFaceIndex(),
+		m_mesh->getIsBoundary(),
+		m_mesh->getAdjacentVV(),
+		m_mesh->getBoundaryVertexCount()
+	);
+	m_parameterization->calculate(boundaryType, innerType);
+	
+	// set texture coordiante
+	m_mesh->setTextureCoordinate(m_parameterization->getParameterizedResult(SpatialDimension::D2));
 }
 
 
 // build vao and vbo, and initialize arcballl
 void Model::buildVAOAndVBO()
 {
-	if (m_mesh == nullptr)
-	{
-		// todo: throw exception
-		return;
-	}
+	if (m_mesh == nullptr) return;
 
-	if (m_shaderProgram == nullptr)
-	{
-		// todo: throw exception
-		return;
-	}
+	if (m_shaderProgram == nullptr) return;
 
 	makeCurrent();
 	// initial
@@ -122,7 +154,7 @@ void Model::buildVAOAndVBO()
 	// allocate memory for vertex position and normal
 	int unitSize = m_mesh->getVertexCount() * sizeof(float);
 	int offset = 0;
-	if (m_isTextureLoad)
+	if (m_hasTexture)
 	{
 		m_vbo.allocate(unitSize * (3 + 3 + 2));
 	}
@@ -144,23 +176,56 @@ void Model::buildVAOAndVBO()
 	offset += unitSize * 3;
 
 	// texture 
-	if (m_isTextureLoad)
+	if (m_hasTexture)
 	{
 		glEnableVertexAttribArray(2);
 		m_vbo.write(offset, m_mesh->getTextureCoordinate().constData(), unitSize * 2);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(offset));
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(offset));
 	}
 
 	m_vbo.release();
 	m_vao.release();
-	m_shaderProgram->release();
-
-	// can draw
-	m_isModelLoaded = true;
-	
-	// =========== initalize arcball =======
-	m_arcball = new ArcBall(RenderViewWidth, RenderViewWidth, 0.1f);
+	m_shaderProgram->release();	
 }
+
+
+void Model::buildTexture(QString textureFile)
+{
+	if (m_shaderProgram == nullptr) return;
+
+	makeCurrent();
+	m_shaderProgram->bind();
+	m_vao.bind();
+
+	glEnable(GL_TEXTURE_2D);
+	glGenTextures(1, &m_textureID);
+	glBindTexture(GL_TEXTURE_2D, m_textureID);
+	// set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	m_texture = cv::imread(textureFile.toStdString());
+
+	if (m_texture.empty())
+	{
+		qDebug() << "ERROR::IMAGE::setup texture failed";
+	}
+	else
+	{
+		// image may align
+		glPixelStorei(GL_UNPACK_ALIGNMENT, (m_texture.step & 3) ? 1 : 4);
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, m_texture.step / m_texture.elemSize());
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_texture.cols, m_texture.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, m_texture.ptr());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+
+	m_vao.release();
+	m_shaderProgram->release();
+}
+
 
 void Model::draw()
 {
@@ -181,7 +246,7 @@ void Model::draw()
 	// draw mode
 	switch (m_polygonWay)
 	{
-	case MeshPolygonType::NONE:
+	case MeshPolygonType::NONE_POLYGON_TYPE:
 		break;
 	case MeshPolygonType::FILL:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -197,8 +262,10 @@ void Model::draw()
 		break;
 	}
 
-	if (m_polygonWay != MeshPolygonType::NONE)
+	if (m_polygonWay != MeshPolygonType::NONE_POLYGON_TYPE)
 	{
+		if (m_hasTexture)
+			glBindTexture(GL_TEXTURE_2D, m_textureID);
 		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex().constData());
 	}
 	
@@ -225,9 +292,28 @@ void Model::setProjMatValue(glm::mat4 projMat)
 	m_projMat = projMat;
 }
 
+
 void Model::setPolygonWay(MeshPolygonType polygonWay)
 {
 	m_polygonWay = polygonWay;
+}
+
+
+void Model::setParameterizationInnerType(ParameterizationInnerType innerType)
+{
+	m_parameterizationInnerType = innerType;
+}
+
+
+void Model::setModelFileName(QString modelFileName)
+{
+	m_modelFileName = modelFileName;
+}
+
+
+void Model::setTextureFileName(QString textureFileName)
+{
+	m_textureFileName = textureFileName;
 }
 
 
@@ -254,17 +340,18 @@ void Model::setUniformValue()
 	m_shaderProgram->release();
 }
 
+
 // ======== flags value get =============
-const bool Model::isModelLoaded() const
+const bool Model::getCanDraw() const
 {
-	return m_isModelLoaded;
+	return m_canDraw;
 }
 
+
 // =========== helper function =============
-void Model::delModel()
+void Model::destoryRender()
 {
-	// pretend to delete
-	m_isModelLoaded = false;
+	m_canDraw = false;
 
 	if (m_mesh != nullptr)
 	{

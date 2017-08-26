@@ -4,8 +4,6 @@ RenderView::RenderView(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
 	m_model = new Model();
-	// m_scrWidth = 1000;
-	// m_scrHeight = 800;
 
 	m_vertexShaderFilePath = "./shader/modelShader.vert";
 	m_fragmentShaderFilePath = "./shader/modelShader.frag";
@@ -26,15 +24,15 @@ void RenderView::initializeGL()
 	m_modelMat = glm::mat4(1.0f);
 	m_viewMat = glm::lookAt(glm::vec3(0.0f, 0.0f, 1.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	m_projMat = glm::perspective(glm::radians(45.0f), RenderViewWidth / RenderViewHeight, 0.01f, 100.0f);
-
 }
+
 
 void RenderView::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// set MVP model
-	if (m_model->isModelLoaded())
+	if (m_model->getCanDraw())
 	{
 		m_model->setViewMatValue(m_viewMat);
 		m_model->setProjMatValue(m_projMat);
@@ -42,7 +40,6 @@ void RenderView::paintGL()
 		
 		m_model->draw();
 	}
-
 }
 
 /*
@@ -60,29 +57,27 @@ void RenderView::mousePressEvent(QMouseEvent *mouseEvent)
 	float x = mouseEvent->x();
 	float y = mouseEvent->y();
 
-	if (mouseEvent->button() == Qt::LeftButton)
+	if (!m_model->getCanDraw())
 	{
-		if (m_model->isModelLoaded())
-		{
-			m_model->m_arcball->mousePressCallback(Qt::LeftButton, x, y);
-			update();
-		}
+		return;
+	}
+
+	if (mouseEvent->button() == Qt::LeftButton)
+	{		
+		m_model->m_arcball->mousePressCallback(Qt::LeftButton, x, y);
 	}
 	else if (mouseEvent->button() == Qt::RightButton)
 	{
-		if (m_model->isModelLoaded())
-		{
-			m_model->m_arcball->mousePressCallback(Qt::RightButton, x, y);
-			update();
-		}
+		m_model->m_arcball->mousePressCallback(Qt::RightButton, x, y);
 	}
-	
+
+	update();
 }
 
 
 void RenderView::mouseReleaseEvent(QMouseEvent *mouseEvent)
 {
-	if (m_model->isModelLoaded())
+	if (m_model->getCanDraw())
 	{
 		m_model->m_arcball->mouseReleaseCallback();
 		update();
@@ -94,22 +89,13 @@ void RenderView::mouseMoveEvent(QMouseEvent *mouseEvent)
 {
 	float x = mouseEvent->x();
 	float y = mouseEvent->y();
-	if (m_model->isModelLoaded())
+	if (m_model->getCanDraw())
 	{
 		m_model->m_arcball->mouseMoveCallback(x, y);
 		update();
 	}
 }
 
-
-// ================ helper function =============
-void RenderView::buildModel()
-{
-	makeCurrent();
-	m_model->loadMeshFromFile(m_modelFilePath);
-	m_model->buildShaderProgram(m_vertexShaderFilePath, m_fragmentShaderFilePath);
-	m_model->buildVAOAndVBO();
-}
 
 // ================= slots =================
 void RenderView::cleanup()
@@ -118,25 +104,55 @@ void RenderView::cleanup()
 }
 
 
-void RenderView::acceptFilePath(QString filePath)
-{
-	m_modelFilePath = filePath;
-	buildModel();
-	update();
-}
-
-
 void RenderView::onModelDelBtnClicked()
 {
 	makeCurrent();
-	m_model->delModel();
+	m_model->destoryRender();
 	update();
 }
 
 
-void RenderView::acceptPolygonType(MeshPolygonType polygonWay)
+void RenderView::onModelTextureDelBtnClicked()
 {
 	makeCurrent();
-	m_model->setPolygonWay(polygonWay);
+	m_model->setTextureFileName("");
+	m_model->buildMesh(m_vertexShaderFilePath, m_fragmentShaderFilePath);
+	update();
+}
+
+
+void RenderView::acceptString(FileType fileType, QString fileName)
+{
+	makeCurrent();
+	switch (fileType)
+	{
+	case FileType::MODEL:
+		m_model->setModelFileName(fileName);
+		m_model->buildMesh(m_vertexShaderFilePath, m_fragmentShaderFilePath);
+		break;
+	case FileType::TEXTURE:
+		m_model->setTextureFileName(fileName);
+		m_model->attachTexture(m_vertexShaderFilePath, m_fragmentShaderFilePath);
+		break;
+	default:
+		break;
+	}
+	update();
+}
+
+
+void RenderView::acceptPolygonType(MeshPolygonType polygonType)
+{
+	makeCurrent();
+	m_model->setPolygonWay(polygonType);
+	update();
+}
+
+
+void RenderView::acceptParameterizationInnerType(ParameterizationInnerType innerType)
+{
+	makeCurrent();
+	m_model->setParameterizationInnerType(innerType);
+	m_model->attachTexture(m_vertexShaderFilePath, m_fragmentShaderFilePath);
 	update();
 }

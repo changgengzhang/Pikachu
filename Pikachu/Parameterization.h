@@ -28,19 +28,21 @@ class Parameterization : public QObject
 
 public:
 	Parameterization(const QVector<float> &vertexPos, const QVector<uint> &faceIndex, 
-					const QVector<bool> &isBoundary, const SparseMatrix<int> &adjacentVV, const int boundaryVertexCount);
+					const QVector<bool> &isBoundary, const SparseMatrix<int> *adjacentVV, const int boundaryVertexCount);
 	//Parameterization(Mesh &mesh);
 
 	~Parameterization();
 	void calculate(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType);
+	void dumpToObjeFile(QString fileName) const;
+	const QVector<float>& getParameterizedResult(SpatialDimension dimensionType);
 
 private:
 	// ========== function =============
 	void findBoundaryAndInnerVertices();
 	void boundaryVerticesParameterize(ParameterizationBoundaryType boundaryType);
 	void innerVerticesParameterize(ParameterizationInnerType innerType);
-	void mergeBoundaryAndInnerParameterizedResult();
-	void dumpToObjeFile();
+	void mergeBoundaryAndInnerParameterizedResult(SpatialDimension type);
+	
 
 	// ========= values ===============
 	int m_vertexCount;
@@ -51,15 +53,13 @@ private:
 	const QVector<float> &m_vertexPos;
 	const QVector<uint> &m_faceIndex;
 	const QVector<bool> &m_isBoundary;
-	const SparseMatrix<int> &m_adjacentVV;
+	const SparseMatrix<int> *m_adjacentVV;
 
 	QVector<uint> m_boundaryVertexIndices;
 	QVector<float> m_boundaryVerticesResult;
 	QVector<uint> m_innerVertexIndices;
 	QVector<float> m_innerVerticesResult;
 	QVector<float> m_parameterizedResult;
-
-	QString m_dumpFileName;
 
 };
 

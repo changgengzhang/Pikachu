@@ -21,5 +21,5 @@ void main()
 {
 	gl_Position = projMat * viewMat * modelMat * vec4(position, 1.0f);
 	vsOut.position = gl_Position;
-	//vsOut.textCoord = textCoord;
+	vsOut.textCoord = textCoord;
 }
