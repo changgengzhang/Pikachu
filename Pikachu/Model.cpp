@@ -57,7 +57,7 @@ void Model::attachTexture(QString vertexShaderFile, QString fragmentShaderFile)
 	m_hasTexture = m_parameterizationInnerType != ParameterizationInnerType::NONE_INNER_TYPE && !m_textureFileName.isEmpty();
 	if (m_canDraw && m_hasTexture)
 	{
-		this->buildMeshParameterization(ParameterizationBoundaryType::SQUARE, m_parameterizationInnerType);
+		this->buildMeshParameterization(ParameterizationBoundaryType::CIRCLE, m_parameterizationInnerType);
 		this->buildShaderProgram(vertexShaderFile, fragmentShaderFile);
 		this->getUniformLoc();
 		this->buildVAOAndVBO();
@@ -117,9 +117,11 @@ void Model::buildMeshParameterization(ParameterizationBoundaryType boundaryType,
 		m_mesh->getBoundaryVertexCount()
 	);
 	m_parameterization->calculate(boundaryType, innerType);
-	
+
 	// set texture coordiante
 	m_mesh->setTextureCoordinate(m_parameterization->getParameterizedResult(SpatialDimension::D2));
+
+	m_parameterization->dumpToObjeFile("..//Data/param_cat_head.obj");
 }
 
 

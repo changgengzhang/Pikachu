@@ -37,7 +37,7 @@ void Parameterization::dumpToObjeFile(QString fileName) const
 	// vertex
 	for (int i = 0; i < m_vertexCount; i++)
 	{
-		dumpStream << "v " << m_parameterizedResult[i * 3] << " " << m_parameterizedResult[i * 3 + 1] << " " << m_parameterizedResult[i * 3 + 2] << "\n";
+		dumpStream << "v " << m_parameterizedResult[i * 2] << " " << m_parameterizedResult[i * 2 + 1] << " " << "0.0f" << "\n";
 	}
 
 	// face
@@ -155,19 +155,19 @@ void Parameterization::boundaryVerticesParameterize(ParameterizationBoundaryType
 		float edgeLenth = 1.0f;
 		for (uint i = 0; i < m_boundaryVertexCount; i++)
 		{
-			if (weight[i] < 0.25)
+			if (weight[i] <= 0.25)
 			{
 				m_boundaryVerticesResult.append(weight.at(i) * 4 * edgeLenth - edgeLenth / 2.0f);
 				m_boundaryVerticesResult.append(-edgeLenth / 2.0f);
 				m_boundaryVerticesResult.append(0.0f);
 			}
-			else if (weight[i] < 0.50)
+			else if (weight[i] <= 0.50)
 			{
 				m_boundaryVerticesResult.append(edgeLenth / 2.0f);
 				m_boundaryVerticesResult.append((weight.at(i) - 0.25) * 4 * edgeLenth - edgeLenth / 2.0f);
 				m_boundaryVerticesResult.append(0.0f);
 			}
-			else if (weight[i] < 0.75)
+			else if (weight[i] <= 0.75)
 			{
 				m_boundaryVerticesResult.append(edgeLenth / 2.0f - (weight.at(i) - 0.5) * 4 * edgeLenth);
 				m_boundaryVerticesResult.append(edgeLenth / 2.0f);
@@ -292,7 +292,7 @@ void Parameterization::innerVerticesParameterize(ParameterizationInnerType inner
 			else
 			{
 				// 内部点 叠加？
-				matrixA(i, index) = -matrixCofficient.at(j);
+				matrixA(i, index) -= matrixCofficient.at(j);
 			}
 		}
 		matrixB(i, 0) = b.x;
@@ -315,6 +315,7 @@ void Parameterization::mergeBoundaryAndInnerParameterizedResult(SpatialDimension
 {
 	assert(dimensionType == SpatialDimension::D2 || dimensionType == SpatialDimension::D3);
 	int index, step;
+
 	step = dimensionType == SpatialDimension::D3 ? 3 : 2;
 
 	m_parameterizedResult.resize(m_vertexCount * step);
