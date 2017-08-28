@@ -33,58 +33,59 @@ public:
 	Model(QWidget *parent=0);
 	~Model();
 
-	void buildMesh(QString vertexShaderFile, QString fragmentShaderFile);
-	void attachTexture(QString vertexShaderFile, QString fragmentShaderFile);
-	void destoryRender();
+	void buildMesh(QString vertexShaderFile, QString fragmentShaderFile, QString modelFile);
+	void cleanup();
 	void draw();
+	void deleteTexture();
 
 	// ========= set uniform value ===========
+	void setCanRender(bool canRender = true);
+
 	void setViewMatValue(glm::mat4 viewMat);
 	void setProjMatValue(glm::mat4 projMat);
 
-	void setPolygonWay(MeshPolygonType polygonWay);
-	void setParameterizationInnerType(ParameterizationInnerType innerType);
-	void setModelFileName(QString modelFileName);
-	void setTextureFileName(QString textureFileName);
+	void setPolygonWay(ZVALUE polygonWay);
 
-	void setCanDraw(bool canDraw);
+	void setTextureFileName(QString textureFileName);
+	void setParameterizationInnerType(ZVALUE innerType);
 
 	// ========= arcball ================
 	void mousePressEvent(QMouseEvent *mouseEvent) override;
 	void mouseReleaseEvent(QMouseEvent *mouseEvent) override;
 	void mouseMoveEvent(QMouseEvent *mouseEvent) override;
 
-	ArcBall *m_arcball;
-
 private:
 	// ========= OpenGL context build function =============
 	bool loadMeshFromFile(QString modelFile);
 	void buildShaderProgram(QString vertexFile, QString fragmentFile);
-	void buildMeshParameterization(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType);
+	void buildMeshParameterization(ZVALUE boundaryType, ZVALUE innerType);
 	void buildVAOAndVBO();
-	void buildTexture(QString textureFile);
+	void generateTexture(QString textureFile);
 
 	// ========= tools functions ============	
 	void getUniformLoc();
 	void setUniformValue();
-	void setModelMatValue();
+
+	void attachTexture();
 
 private:
-	bool canRender;
+	bool m_canRender;
 	// mesh
 	Mesh* m_mesh;
 	bool m_meshReady;
 	QString m_modelFileName;
-	MeshPolygonType m_polygonWay;
+	ZVALUE m_polygonWay;
 
 	// texture
 	Parameterization *m_parameterization;
 	QString m_textureFileName;
-	ParameterizationInnerType m_parameterizationInnerType;
+	ZVALUE m_parameterizationInnerType;
 	bool m_textureReady;
 	cv::Mat m_texture;
 
 	// ========  shader ===============
+	QString m_vertexShaderFile;
+	QString m_fragmentShaderFile;
 	QOpenGLShaderProgram *m_shaderProgram;
 	QOpenGLVertexArrayObject m_vao;
 	QOpenGLBuffer m_vbo;
@@ -102,7 +103,7 @@ private:
 	GLuint m_hasTextureLoc;
 
 	// Arc ball
-
+	ArcBall *m_arcball;
 };
 
 #endif // !MODEL_H

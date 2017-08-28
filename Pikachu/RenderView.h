@@ -40,8 +40,8 @@ public slots:
 	void onModelDelBtnClicked();
 	void onModelTextureDelBtnClicked();
 	void acceptString(FileType fileType, QString fileName);
-	void acceptPolygonType(MeshPolygonType polygonType);
-	void acceptParameterizationInnerType(ParameterizationInnerType innerType);
+	void acceptPolygonType(ZVALUE polygonType);
+	void acceptParameterizationInnerType(ZVALUE innerType);
 
 private:
 	// ========= MVP matrix ==========
@@ -51,14 +51,10 @@ private:
 
 	// ========= Model ===============
 	Model *m_model;
-	QString m_modelFileName;
 
 	// ========= shader file path =========
 	QString m_vertexShaderFilePath;
 	QString m_fragmentShaderFilePath;
-
-	// texture
-	QString m_textureFileName;
 
 };
 

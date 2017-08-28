@@ -25,8 +25,8 @@ private:
 	// =========== signals ==========
 signals:
 	void deliverString(FileType fileType, QString fileName);
-	void deliverPolygonType(MeshPolygonType polygonWay);
-	void deliverParameterizationInnerType(ParameterizationInnerType innerType);
+	void deliverPolygonType(ZVALUE polygonWay);
+	void deliverParameterizationInnerType(ZVALUE innerType);
 
 
 	// ============ slots ===========

@@ -84,7 +84,7 @@ void RenderView::cleanup()
 void RenderView::onModelDelBtnClicked()
 {
 	makeCurrent();
-	m_model->destoryRender();
+	m_model->cleanup();
 	update();
 }
 
@@ -92,8 +92,7 @@ void RenderView::onModelDelBtnClicked()
 void RenderView::onModelTextureDelBtnClicked()
 {
 	makeCurrent();
-	m_model->setTextureFileName("");
-	m_model->buildMesh(m_vertexShaderFilePath, m_fragmentShaderFilePath);
+	m_model->deleteTexture();
 	update();
 }
 
@@ -104,12 +103,10 @@ void RenderView::acceptString(FileType fileType, QString fileName)
 	switch (fileType)
 	{
 	case FileType::MODEL:
-		m_model->setModelFileName(fileName);
-		m_model->buildMesh(m_vertexShaderFilePath, m_fragmentShaderFilePath);
+		m_model->buildMesh(m_vertexShaderFilePath, m_fragmentShaderFilePath, fileName);
 		break;
 	case FileType::TEXTURE:
 		m_model->setTextureFileName(fileName);
-		m_model->attachTexture(m_vertexShaderFilePath, m_fragmentShaderFilePath);
 		break;
 	default:
 		break;
@@ -118,7 +115,7 @@ void RenderView::acceptString(FileType fileType, QString fileName)
 }
 
 
-void RenderView::acceptPolygonType(MeshPolygonType polygonType)
+void RenderView::acceptPolygonType(ZVALUE polygonType)
 {
 	makeCurrent();
 	m_model->setPolygonWay(polygonType);
@@ -126,10 +123,9 @@ void RenderView::acceptPolygonType(MeshPolygonType polygonType)
 }
 
 
-void RenderView::acceptParameterizationInnerType(ParameterizationInnerType innerType)
+void RenderView::acceptParameterizationInnerType(ZVALUE innerType)
 {
 	makeCurrent();
 	m_model->setParameterizationInnerType(innerType);
-	m_model->attachTexture(m_vertexShaderFilePath, m_fragmentShaderFilePath);
 	update();
 }

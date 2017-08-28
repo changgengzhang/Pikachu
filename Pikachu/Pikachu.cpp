@@ -35,9 +35,9 @@ void Pikachu::buildSlotsAndSignals()
 	connect(m_ui.modelTextureShapPreserveBtn, SIGNAL(stateChanged(int)), this, SLOT(onModelTextureShapPreserveBtnClicked(int)));
 
 	// deliver data 
-	connect(this, SIGNAL(deliverPolygonType(MeshPolygonType)), m_ui.renderView, SLOT(acceptPolygonType(MeshPolygonType)));
+	connect(this, SIGNAL(deliverPolygonType(ZVALUE)), m_ui.renderView, SLOT(acceptPolygonType(ZVALUE)));
 	connect(this, SIGNAL(deliverString(FileType, QString)), m_ui.renderView, SLOT(acceptString(FileType, QString)));
-	connect(this, SIGNAL(deliverParameterizationInnerType(ParameterizationInnerType)), m_ui.renderView, SLOT(acceptParameterizationInnerType(ParameterizationInnerType)));
+	connect(this, SIGNAL(deliverParameterizationInnerType(ZVALUE)), m_ui.renderView, SLOT(acceptParameterizationInnerType(ZVALUE)));
 }
 
 
@@ -64,11 +64,11 @@ void Pikachu::onModelPolygonFaceBtnClicked(int state)
 	{
 		m_ui.modelPolygonLineBtn->setCheckState(Qt::Unchecked);
 		m_ui.modelPolygonPointBtn->setCheckState(Qt::Unchecked);
-		emit deliverPolygonType(MeshPolygonType::FILL);
+		emit deliverPolygonType(Z_FILL);
 	}
 	else
 	{
-		emit deliverPolygonType(MeshPolygonType::NONE_POLYGON_TYPE);
+		emit deliverPolygonType(Z_NONE);
 	}
 }
 
@@ -79,11 +79,11 @@ void Pikachu::onModelPolygonLineBtnClicked(int state)
 	{
 		m_ui.modelPolygonFaceBtn->setCheckState(Qt::Unchecked);
 		m_ui.modelPolygonPointBtn->setCheckState(Qt::Unchecked);
-		emit deliverPolygonType(MeshPolygonType::LINE);
+		emit deliverPolygonType(Z_LINE);
 	}
 	else
 	{
-		emit deliverPolygonType(MeshPolygonType::NONE_POLYGON_TYPE);
+		emit deliverPolygonType(Z_NONE);
 	}
 }
 
@@ -94,11 +94,11 @@ void Pikachu::onModelPolygonPointBtnClicked(int state)
 	{
 		m_ui.modelPolygonFaceBtn->setCheckState(Qt::Unchecked);
 		m_ui.modelPolygonLineBtn->setCheckState(Qt::Unchecked);
-		emit deliverPolygonType(MeshPolygonType::POINT);
+		emit deliverPolygonType(Z_POINT);
 	}
 	else
 	{
-		emit deliverPolygonType(MeshPolygonType::NONE_POLYGON_TYPE);
+		emit deliverPolygonType(Z_NONE);
 	}
 }
 
@@ -117,11 +117,11 @@ void Pikachu::onModelTextureAverageBtnClicked(int state)
 	if (state == Qt::Checked)
 	{
 		m_ui.modelTextureShapPreserveBtn->setCheckState(Qt::Unchecked);
-		emit deliverParameterizationInnerType(ParameterizationInnerType::AVERAGE);
+		emit deliverParameterizationInnerType(Z_AVERAGE);
 	}
 	else
 	{
-		emit deliverParameterizationInnerType(ParameterizationInnerType::NONE_INNER_TYPE);
+		emit deliverParameterizationInnerType(Z_NONE);
 	}
 }
 
@@ -131,10 +131,10 @@ void Pikachu::onModelTextureShapPreserveBtnClicked(int state)
 	if (state == Qt::Checked)
 	{
 		m_ui.modelTextureAverageBtn->setCheckState(Qt::Unchecked);
-		emit deliverParameterizationInnerType(ParameterizationInnerType::SHAP_PRESERVING);
+		emit deliverParameterizationInnerType(Z_SHAP_PRESERVING);
 	}
 	else
 	{
-		emit deliverParameterizationInnerType(ParameterizationInnerType::NONE_INNER_TYPE);
+		emit deliverParameterizationInnerType(Z_NONE);
 	}
 }

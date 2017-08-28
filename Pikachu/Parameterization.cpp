@@ -14,7 +14,7 @@ Parameterization::~Parameterization()
 }
 
 
-void Parameterization::calculate(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType)
+void Parameterization::calculate(ZVALUE boundaryType, ZVALUE innerType)
 {
 	this->findBoundaryAndInnerVertices();
 	this->boundaryVerticesParameterize(boundaryType);
@@ -24,7 +24,7 @@ void Parameterization::calculate(ParameterizationBoundaryType boundaryType, Para
 
 void Parameterization::dumpToObjeFile(QString fileName)
 {
-	this->mergeBoundaryAndInnerParameterizedResult(SpatialDimension::D3);
+	this->mergeBoundaryAndInnerParameterizedResult(Z_3D);
 
 	QFile dumpFile(fileName);
 	if (!dumpFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
@@ -53,7 +53,7 @@ void Parameterization::dumpToObjeFile(QString fileName)
 }
 
 
-const QVector<float>& Parameterization::getParameterizedResult(SpatialDimension dimensionType)
+const QVector<float>& Parameterization::getParameterizedResult(ZVALUE dimensionType)
 {
 	this->mergeBoundaryAndInnerParameterizedResult(dimensionType);
 	return m_parameterizedResult;
@@ -121,9 +121,9 @@ void Parameterization::findBoundaryAndInnerVertices()
 }
 
 
-void Parameterization::boundaryVerticesParameterize(ParameterizationBoundaryType boundaryType)
+void Parameterization::boundaryVerticesParameterize(ZVALUE boundaryType)
 {
-	assert(boundaryType == ParameterizationBoundaryType::SQUARE || boundaryType == ParameterizationBoundaryType::CIRCLE);
+	assert(boundaryType == Z_SQUARE || boundaryType == Z_CIRCLE);
 	m_boundaryLength = 0.0f;
 	
 	// calculate boundary length and per vertex weight
@@ -152,7 +152,7 @@ void Parameterization::boundaryVerticesParameterize(ParameterizationBoundaryType
 	// vertex parameterize
 	switch (boundaryType)
 	{
-	case ParameterizationBoundaryType::SQUARE:
+	case Z_SQUARE:
 	{
 		float edgeLenth = 1.0f;
 		for (uint i = 0; i < m_boundaryVertexCount; i++)
@@ -184,7 +184,7 @@ void Parameterization::boundaryVerticesParameterize(ParameterizationBoundaryType
 		}
 		break;
 	}
-	case ParameterizationBoundaryType::CIRCLE:
+	case Z_CIRCLE:
 	{
 		float radius = 0.5f;
 		float circle = 2 * M_PI;
@@ -202,9 +202,9 @@ void Parameterization::boundaryVerticesParameterize(ParameterizationBoundaryType
 }
 
 
-void Parameterization::innerVerticesParameterize(ParameterizationInnerType innerType)
+void Parameterization::innerVerticesParameterize(ZVALUE innerType)
 {
-	assert(innerType == ParameterizationInnerType::AVERAGE || innerType == ParameterizationInnerType::SHAP_PRESERVING);
+	assert(innerType == Z_AVERAGE || innerType == Z_SHAP_PRESERVING);
 
 	int innerCount = m_innerVertexIndices.count();
 	int boundaryCount = m_boundaryVertexIndices.count();
@@ -233,7 +233,7 @@ void Parameterization::innerVerticesParameterize(ParameterizationInnerType inner
 		QVector<float> matrixCofficient;
 		switch (innerType)
 		{
-		case ParameterizationInnerType::AVERAGE:
+		case Z_AVERAGE:
 		{
 			for (int w = 0; w < neighborCount; w++)
 			{
@@ -241,7 +241,7 @@ void Parameterization::innerVerticesParameterize(ParameterizationInnerType inner
 			}
 			break;
 		}
-		case ParameterizationInnerType::SHAP_PRESERVING:
+		case Z_SHAP_PRESERVING:
 		{
 			QVector<float> edgeWeight;
 			float totalLength = 0.0f, edgeLenght;
@@ -313,12 +313,12 @@ void Parameterization::innerVerticesParameterize(ParameterizationInnerType inner
 }
 
 
-void Parameterization::mergeBoundaryAndInnerParameterizedResult(SpatialDimension dimensionType)
+void Parameterization::mergeBoundaryAndInnerParameterizedResult(ZVALUE dimensionType)
 {
-	assert(dimensionType == SpatialDimension::D2 || dimensionType == SpatialDimension::D3);
+	assert(dimensionType == Z_2D || dimensionType == Z_3D);
 	int index, step;
 
-	step = dimensionType == SpatialDimension::D3 ? 3 : 2;
+	step = dimensionType == Z_3D ? 3 : 2;
 
 	m_parameterizedResult.resize(m_vertexCount * step);
 	m_parameterizedResult.squeeze();
@@ -328,7 +328,7 @@ void Parameterization::mergeBoundaryAndInnerParameterizedResult(SpatialDimension
 		index = m_boundaryVertexIndices.at(i);
 		m_parameterizedResult[index * step] = m_boundaryVerticesResult[i * 3];
 		m_parameterizedResult[index * step + 1] = m_boundaryVerticesResult[i * 3 + 1];
-		if (dimensionType == SpatialDimension::D3)
+		if (dimensionType == Z_3D)
 		{
 			m_parameterizedResult[index * step + 2] = m_boundaryVerticesResult[i * 3 + 2];
 		}	
@@ -339,7 +339,7 @@ void Parameterization::mergeBoundaryAndInnerParameterizedResult(SpatialDimension
 		index = m_innerVertexIndices.at(i);
 		m_parameterizedResult[index * step] = m_innerVerticesResult[i * 3];
 		m_parameterizedResult[index * step + 1] = m_innerVerticesResult[i * 3 + 1];
-		if (dimensionType == SpatialDimension::D3)
+		if (dimensionType == Z_3D)
 		{
 			m_parameterizedResult[index * step + 2] = m_innerVerticesResult[i * 3 + 2];
 		}

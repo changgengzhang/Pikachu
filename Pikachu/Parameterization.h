@@ -32,16 +32,16 @@ public:
 	//Parameterization(Mesh &mesh);
 
 	~Parameterization();
-	void calculate(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType);
+	void calculate(ZVALUE boundaryType, ZVALUE innerType);
 	void dumpToObjeFile(QString fileName);
-	const QVector<float>& getParameterizedResult(SpatialDimension dimensionType);
+	const QVector<float>& getParameterizedResult(ZVALUE dimensionType);
 
 private:
 	// ========== function =============
 	void findBoundaryAndInnerVertices();
-	void boundaryVerticesParameterize(ParameterizationBoundaryType boundaryType);
-	void innerVerticesParameterize(ParameterizationInnerType innerType);
-	void mergeBoundaryAndInnerParameterizedResult(SpatialDimension type);
+	void boundaryVerticesParameterize(ZVALUE boundaryType);
+	void innerVerticesParameterize(ZVALUE innerType);
+	void mergeBoundaryAndInnerParameterizedResult(ZVALUE dimensionType);
 	
 
 	// ========= values ===============
