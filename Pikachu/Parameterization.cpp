@@ -22,8 +22,10 @@ void Parameterization::calculate(ParameterizationBoundaryType boundaryType, Para
 }
 
 
-void Parameterization::dumpToObjeFile(QString fileName) const
+void Parameterization::dumpToObjeFile(QString fileName)
 {
+	this->mergeBoundaryAndInnerParameterizedResult(SpatialDimension::D3);
+
 	QFile dumpFile(fileName);
 	if (!dumpFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
 	{
@@ -37,7 +39,7 @@ void Parameterization::dumpToObjeFile(QString fileName) const
 	// vertex
 	for (int i = 0; i < m_vertexCount; i++)
 	{
-		dumpStream << "v " << m_parameterizedResult[i * 2] << " " << m_parameterizedResult[i * 2 + 1] << " " << "0.0f" << "\n";
+		dumpStream << "v " << m_parameterizedResult[i * 3] << " " << m_parameterizedResult[i * 3 + 1] << " " << m_parameterizedResult[i * 3 + 2] << "\n";
 	}
 
 	// face

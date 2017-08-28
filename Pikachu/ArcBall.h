@@ -4,6 +4,7 @@
 #include <qobject.h>
 #include <qglobal.h>
 #include <qdebug.h>
+#include <qevent.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
@@ -16,9 +17,9 @@ class ArcBall
 public:
 	ArcBall(float windowWidth, float windowHeight, float mouseSensitivity);
 	~ArcBall();
-	void mousePressCallback(Qt::MouseButton mouseButton, float x, float y);
-	void mouseReleaseCallback();
-	void mouseMoveCallback(float x, float y);
+	void mousePressEvent(QMouseEvent *mouseEvent);
+	void mouseReleaseEvent(QMouseEvent *mouseEvent);
+	void mouseMoveEvent(QMouseEvent *mouseEvent);
 	void wheelEventCallback(float zoomValue);
 
 	glm::mat4 getModelMatrix(glm::mat4& viewMatrix);
@@ -32,7 +33,6 @@ private:
 	float m_adjustCoord;
 	float m_mouseSensitivity;
 	
-	Qt::MouseButton m_mouseButton;
 	glm::vec2 m_preScrCoord;
 	glm::vec2 m_currScrCoord;
 

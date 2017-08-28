@@ -3,12 +3,12 @@
 Model::Model(QWidget *parent)
 	: QOpenGLWidget(parent)
 {
-	m_canDraw = false;
+	m_meshReady = false;
 	m_mesh = nullptr;
 	m_polygonWay = MeshPolygonType::NONE_POLYGON_TYPE;
 	
 	m_parameterization = nullptr;
-	m_hasTexture = false;
+	m_textureReady = false;
 	m_parameterizationInnerType = ParameterizationInnerType::NONE_INNER_TYPE;
 
 	m_shaderProgram = nullptr;
@@ -24,28 +24,26 @@ Model::~Model()
 
 void Model::buildMesh(QString vertexShaderFile, QString fragmentShaderFile)
 {
-	m_hasTexture = m_parameterizationInnerType != ParameterizationInnerType::NONE_INNER_TYPE && !m_textureFileName.isEmpty();
+	m_textureReady = (m_parameterizationInnerType != ParameterizationInnerType::NONE_INNER_TYPE) && (!m_textureFileName.isEmpty());
 
 	this->loadMeshFromFile(m_modelFileName);
 
-	if (m_hasTexture)
+	if (m_textureReady)
 	{
 		this->buildMeshParameterization(ParameterizationBoundaryType::SQUARE, m_parameterizationInnerType);
 	}
 
 	this->buildShaderProgram(vertexShaderFile, fragmentShaderFile);
-
 	this->getUniformLoc();
-
 	this->buildVAOAndVBO();
 
-	if (m_hasTexture)
+	if (m_textureReady)
 	{
 		this->buildTexture(m_textureFileName);
 	}
 
 	// can draw
-	m_canDraw = true;
+	m_meshReady = true;
 
 	// =========== initalize arcball =======
 	m_arcball = new ArcBall(RenderViewWidth, RenderViewWidth, 0.1f);
@@ -54,15 +52,104 @@ void Model::buildMesh(QString vertexShaderFile, QString fragmentShaderFile)
 
 void Model::attachTexture(QString vertexShaderFile, QString fragmentShaderFile)
 {
-	m_hasTexture = m_parameterizationInnerType != ParameterizationInnerType::NONE_INNER_TYPE && !m_textureFileName.isEmpty();
-	if (m_canDraw && m_hasTexture)
+	m_textureReady = m_parameterizationInnerType != ParameterizationInnerType::NONE_INNER_TYPE && !m_textureFileName.isEmpty();
+	if (m_meshReady && m_textureReady)
 	{
-		this->buildMeshParameterization(ParameterizationBoundaryType::CIRCLE, m_parameterizationInnerType);
+		this->buildMeshParameterization(ParameterizationBoundaryType::SQUARE, m_parameterizationInnerType);
 		this->buildShaderProgram(vertexShaderFile, fragmentShaderFile);
 		this->getUniformLoc();
 		this->buildVAOAndVBO();
 		this->buildTexture(m_textureFileName);
 	}
+}
+
+void Model::destoryRender()
+{
+	m_meshReady = false;
+
+	if (m_mesh != nullptr)
+	{
+		delete m_mesh;
+		m_mesh = nullptr;
+	}
+
+	if (m_shaderProgram != nullptr)
+	{
+		delete m_shaderProgram;
+		m_shaderProgram = nullptr;
+	}
+
+	if (m_vao.isCreated())
+	{
+		m_vao.destroy();
+	}
+
+	if (m_vbo.isCreated())
+	{
+		m_vbo.destroy();
+	}
+
+	if (m_arcball != nullptr)
+	{
+		delete m_arcball;
+		m_arcball = nullptr;
+	}
+}
+
+
+void Model::draw()
+{
+	makeCurrent();
+	if (!canRender)
+	{
+		update();
+		return;
+	}
+
+	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
+	glEnable(GL_DEBUG_OUTPUT);
+
+	// model matrix manage by arcball. One model has one arcball
+	this->setModelMatValue();
+	// set uniform value
+	this->setUniformValue();
+
+	m_shaderProgram->bind();
+	m_vao.bind();
+
+	// draw mode
+	switch (m_polygonWay)
+	{
+	case MeshPolygonType::NONE_POLYGON_TYPE:
+		m_meshReady = false;
+		break;
+	case MeshPolygonType::FILL:
+		m_meshReady = true;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+	case MeshPolygonType::LINE:
+		m_meshReady = false;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		break;
+	case MeshPolygonType::POINT:
+		m_meshReady = false;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+		break;
+	default:
+		m_meshReady = false;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+	}
+
+	if (m_polygonWay != MeshPolygonType::NONE_POLYGON_TYPE)
+	{
+		if (m_textureReady) glBindTexture(GL_TEXTURE_2D, m_textureID);
+		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex().constData());
+	}
+
+	m_vao.release();
+	m_shaderProgram->release();
 }
 
 
@@ -121,7 +208,6 @@ void Model::buildMeshParameterization(ParameterizationBoundaryType boundaryType,
 	// set texture coordiante
 	m_mesh->setTextureCoordinate(m_parameterization->getParameterizedResult(SpatialDimension::D2));
 
-	m_parameterization->dumpToObjeFile("..//Data/param_cat_head.obj");
 }
 
 
@@ -156,7 +242,7 @@ void Model::buildVAOAndVBO()
 	// allocate memory for vertex position and normal
 	int unitSize = m_mesh->getVertexCount() * sizeof(float);
 	int offset = 0;
-	if (m_hasTexture)
+	if (m_textureReady)
 	{
 		m_vbo.allocate(unitSize * (3 + 3 + 2));
 	}
@@ -178,7 +264,7 @@ void Model::buildVAOAndVBO()
 	offset += unitSize * 3;
 
 	// texture 
-	if (m_hasTexture)
+	if (m_textureReady)
 	{
 		glEnableVertexAttribArray(2);
 		m_vbo.write(offset, m_mesh->getTextureCoordinate().constData(), unitSize * 2);
@@ -229,52 +315,6 @@ void Model::buildTexture(QString textureFile)
 }
 
 
-void Model::draw()
-{
-	makeCurrent();
-
-	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
-	glEnable(GL_DEBUG_OUTPUT);
-
-	// model matrix manage by arcball. One model has one arcball
-	this->setModelMatValue();
-	// set uniform value
-	this->setUniformValue();
-
-	m_shaderProgram->bind();
-	m_vao.bind();
-	
-	// draw mode
-	switch (m_polygonWay)
-	{
-	case MeshPolygonType::NONE_POLYGON_TYPE:
-		break;
-	case MeshPolygonType::FILL:
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		break;
-	case MeshPolygonType::LINE:
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		break;
-	case MeshPolygonType::POINT:
-		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-		break;
-	default:
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		break;
-	}
-
-	if (m_polygonWay != MeshPolygonType::NONE_POLYGON_TYPE)
-	{
-		if (m_hasTexture)
-			glBindTexture(GL_TEXTURE_2D, m_textureID);
-		glDrawElements(GL_TRIANGLES, m_mesh->getFaceCount() * 3, GL_UNSIGNED_INT, m_mesh->getFaceIndex().constData());
-	}
-	
-	m_vao.release();
-	m_shaderProgram->release();
-}
-
 
 // ========= set uniform value ===========
 void Model::setModelMatValue()
@@ -318,6 +358,42 @@ void Model::setTextureFileName(QString textureFileName)
 	m_textureFileName = textureFileName;
 }
 
+void Model::setCanDraw(bool canDraw)
+{
+	m_meshReady = canDraw;
+}
+
+
+// ========= arcball ================
+void Model::mousePressEvent(QMouseEvent *mouseEvent)
+{
+	if (!canRender)
+	{
+		return;
+	}
+	m_arcball->mousePressEvent(mouseEvent);
+}
+
+
+void Model::mouseReleaseEvent(QMouseEvent *mouseEvent)
+{
+	if (!canRender)
+	{
+		return;
+	}
+	m_arcball->mouseReleaseEvent(mouseEvent);
+}
+
+
+void Model::mouseMoveEvent(QMouseEvent *mouseEvent)
+{
+	if (!canRender)
+	{
+		return;
+	}
+	m_arcball->mouseMoveEvent(mouseEvent);
+}
+
 
 // ========= tools functions ============	
 void Model::getUniformLoc()
@@ -327,6 +403,7 @@ void Model::getUniformLoc()
 	m_modelMatLoc = m_shaderProgram->uniformLocation("modelMat");
 	m_viewMatLoc = m_shaderProgram->uniformLocation("viewMat");
 	m_projMatLoc = m_shaderProgram->uniformLocation("projMat");
+	m_hasTextureLoc = m_shaderProgram->uniformLocation("hasTexture");
 
 	m_shaderProgram->release();
 }
@@ -338,48 +415,12 @@ void Model::setUniformValue()
 	glUniformMatrix4fv(m_modelMatLoc, 1, GL_FALSE, glm::value_ptr(m_modelMat));
 	glUniformMatrix4fv(m_viewMatLoc, 1, GL_FALSE, glm::value_ptr(m_viewMat));
 	glUniformMatrix4fv(m_projMatLoc, 1, GL_FALSE, glm::value_ptr(m_projMat));
+	glUniform1i(m_hasTextureLoc, m_textureReady);
 
 	m_shaderProgram->release();
 }
 
 
-// ======== flags value get =============
-const bool Model::getCanDraw() const
-{
-	return m_canDraw;
-}
 
 
 // =========== helper function =============
-void Model::destoryRender()
-{
-	m_canDraw = false;
-
-	if (m_mesh != nullptr)
-	{
-		delete m_mesh;
-		m_mesh = nullptr;
-	}
-
-	if (m_shaderProgram != nullptr)
-	{
-		delete m_shaderProgram;
-		m_shaderProgram = nullptr;
-	}
-
-	if (m_vao.isCreated())
-	{
-		m_vao.destroy();
-	}
-
-	if (m_vbo.isCreated())
-	{
-		m_vbo.destroy();
-	}
-
-	if (m_arcball != nullptr)
-	{
-		delete m_arcball;
-		m_arcball = nullptr;
-	}
-}

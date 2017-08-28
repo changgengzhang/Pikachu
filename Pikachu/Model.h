@@ -9,6 +9,7 @@
 #include <qopengl.h>
 #include <qstring.h>
 #include <qdebug.h>
+#include <qevent.h>
 // glm 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -46,10 +47,13 @@ public:
 	void setModelFileName(QString modelFileName);
 	void setTextureFileName(QString textureFileName);
 
-	// ======== flags value get =============
-	const bool getCanDraw() const;
+	void setCanDraw(bool canDraw);
 
 	// ========= arcball ================
+	void mousePressEvent(QMouseEvent *mouseEvent) override;
+	void mouseReleaseEvent(QMouseEvent *mouseEvent) override;
+	void mouseMoveEvent(QMouseEvent *mouseEvent) override;
+
 	ArcBall *m_arcball;
 
 private:
@@ -66,12 +70,10 @@ private:
 	void setModelMatValue();
 
 private:
-	
-	// ========== value ==============
-	bool m_canDraw;
-
-	// model
+	bool canRender;
+	// mesh
 	Mesh* m_mesh;
+	bool m_meshReady;
 	QString m_modelFileName;
 	MeshPolygonType m_polygonWay;
 
@@ -79,14 +81,13 @@ private:
 	Parameterization *m_parameterization;
 	QString m_textureFileName;
 	ParameterizationInnerType m_parameterizationInnerType;
-	bool m_hasTexture;
+	bool m_textureReady;
 	cv::Mat m_texture;
 
 	// ========  shader ===============
 	QOpenGLShaderProgram *m_shaderProgram;
 	QOpenGLVertexArrayObject m_vao;
 	QOpenGLBuffer m_vbo;
-
 	GLuint m_textureID;
 
 	// ========== uniform value ==========
@@ -98,6 +99,9 @@ private:
 	GLuint m_modelMatLoc;
 	GLuint m_viewMatLoc;
 	GLuint m_projMatLoc;
+	GLuint m_hasTextureLoc;
+
+	// Arc ball
 
 };
 

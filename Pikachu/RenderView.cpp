@@ -32,15 +32,13 @@ void RenderView::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// set MVP model
-	if (m_model->getCanDraw())
-	{
-		m_model->setViewMatValue(m_viewMat);
-		m_model->setProjMatValue(m_projMat);
-		//m_model->setModelMatValue(m_modelMat);
-		
-		m_model->draw();
-	}
+	m_model->setViewMatValue(m_viewMat);
+	m_model->setProjMatValue(m_projMat);
+	//m_model->setModelMatValue(m_modelMat);
+
+	m_model->draw();
 }
+
 
 /*
 Sets up the OpenGL viewport, projection, etc. Gets called whenever the widget has been resized
@@ -54,46 +52,25 @@ void RenderView::resizeGL(int width, int height)
 
 void RenderView::mousePressEvent(QMouseEvent *mouseEvent)
 {
-	float x = mouseEvent->x();
-	float y = mouseEvent->y();
-
-	if (!m_model->getCanDraw())
-	{
-		return;
-	}
-
-	if (mouseEvent->button() == Qt::LeftButton)
-	{		
-		m_model->m_arcball->mousePressCallback(Qt::LeftButton, x, y);
-	}
-	else if (mouseEvent->button() == Qt::RightButton)
-	{
-		m_model->m_arcball->mousePressCallback(Qt::RightButton, x, y);
-	}
-
+	makeCurrent();
+	m_model->mousePressEvent(mouseEvent);
 	update();
 }
 
 
 void RenderView::mouseReleaseEvent(QMouseEvent *mouseEvent)
 {
-	if (m_model->getCanDraw())
-	{
-		m_model->m_arcball->mouseReleaseCallback();
-		update();
-	}
+	makeCurrent();
+	m_model->mouseReleaseEvent(mouseEvent);
+	update();
 }
 
 
 void RenderView::mouseMoveEvent(QMouseEvent *mouseEvent)
 {
-	float x = mouseEvent->x();
-	float y = mouseEvent->y();
-	if (m_model->getCanDraw())
-	{
-		m_model->m_arcball->mouseMoveCallback(x, y);
-		update();
-	}
+	makeCurrent();
+	m_model->mouseMoveEvent(mouseEvent);
+	update();
 }
 
 

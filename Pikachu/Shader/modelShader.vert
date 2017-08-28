@@ -9,6 +9,7 @@ uniform mat4 modelMat;
 uniform mat4 viewMat;
 uniform mat4 projMat;
 
+
 // out
 out VSOUT
 {

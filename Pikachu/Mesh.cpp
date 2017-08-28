@@ -436,10 +436,12 @@ const QVector<bool>& Mesh::getIsBoundary() const
 	return m_isBoundary;
 }
 
+
 SparseMatrix<int>* const Mesh::getAdjacentVV() const
 {
 	return m_adjacentVV;
 }
+
 
 // ========= set value ===============
 void Mesh::setTextureCoordinate(const QVector<float> &textureCoord)

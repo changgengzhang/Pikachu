@@ -33,7 +33,7 @@ public:
 
 	~Parameterization();
 	void calculate(ParameterizationBoundaryType boundaryType, ParameterizationInnerType innerType);
-	void dumpToObjeFile(QString fileName) const;
+	void dumpToObjeFile(QString fileName);
 	const QVector<float>& getParameterizedResult(SpatialDimension dimensionType);
 
 private:

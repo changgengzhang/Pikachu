@@ -9,8 +9,16 @@ in VSOUT
 out vec4 fragColor;
 
 uniform sampler2D image;
+uniform bool hasTexture;
 
 void main()
 {
-    fragColor = texture(image, fsIn.textCoord);
+	if(hasTexture)
+	{
+		fragColor = texture(image, fsIn.textCoord);
+	}
+	else
+	{
+		fragColor = fsIn.position + 0.5;
+	}
 } 
