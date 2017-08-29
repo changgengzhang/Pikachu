@@ -11,6 +11,7 @@ RenderView::RenderView(QWidget *parent)
 
 RenderView::~RenderView()
 {
+	this->cleanup();
 }
 
 void RenderView::initializeGL()
@@ -32,11 +33,18 @@ void RenderView::paintGL()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// set MVP model
+	glViewport(0, 0, RenderViewWidth / 2, RenderViewHeight);
 	m_model->setViewMatValue(m_viewMat);
 	m_model->setProjMatValue(m_projMat);
 	//m_model->setModelMatValue(m_modelMat);
-
 	m_model->draw();
+
+	glViewport(RenderViewWidth / 2, 0, RenderViewWidth / 2, RenderViewHeight);
+	m_model->setViewMatValue(m_viewMat);
+	m_model->setProjMatValue(m_projMat);
+	//m_model->setModelMatValue(m_modelMat);
+	m_model->draw();
+
 }
 
 
@@ -103,6 +111,7 @@ void RenderView::acceptString(FileType fileType, QString fileName)
 	switch (fileType)
 	{
 	case FileType::MODEL:
+		m_model->cleanup();
 		m_model->buildMesh(m_vertexShaderFilePath, m_fragmentShaderFilePath, fileName);
 		break;
 	case FileType::TEXTURE:

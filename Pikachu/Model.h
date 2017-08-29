@@ -58,12 +58,10 @@ private:
 	// ========= OpenGL context build function =============
 	bool loadMeshFromFile(QString modelFile);
 	void buildShaderProgram(QString vertexFile, QString fragmentFile);
-	void buildMeshParameterization(ZVALUE boundaryType, ZVALUE innerType);
 	void buildVAOAndVBO();
 	void generateTexture(QString textureFile);
 
 	// ========= tools functions ============	
-	void getUniformLoc();
 	void setUniformValue();
 
 	void attachTexture();
@@ -77,12 +75,11 @@ private:
 	ZVALUE m_polygonWay;
 
 	// texture
-	Parameterization *m_parameterization;
-	QString m_textureFileName;
-	ZVALUE m_parameterizationInnerType;
 	bool m_textureReady;
+	QString m_textureFileName;
+	ZVALUE m_paramInnerType;
 	cv::Mat m_texture;
-
+	
 	// ========  shader ===============
 	QString m_vertexShaderFile;
 	QString m_fragmentShaderFile;

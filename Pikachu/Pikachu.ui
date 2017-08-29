@@ -26,28 +26,6 @@
    <string>Pikachu</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="RenderView" name="renderView">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>1000</width>
-      <height>900</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>1000</width>
-      <height>900</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>1000</width>
-      <height>900</height>
-     </size>
-    </property>
-   </widget>
    <widget class="QTabWidget" name="tabWidget_4">
     <property name="geometry">
      <rect>
@@ -163,7 +141,7 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <widget class="QWidget" name="tab_4">
+    <widget class="QWidget" name="modelTab">
      <attribute name="title">
       <string>    Model    </string>
      </attribute>
@@ -368,11 +346,11 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_10">
+    <widget class="QWidget" name="parameterizationTab">
      <attribute name="title">
       <string>Parameterization</string>
      </attribute>
-     <widget class="QPushButton" name="parameterMoelLoadBtn">
+     <widget class="QPushButton" name="parameterizationMoelLoadBtn">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -401,7 +379,7 @@
        <attribute name="title">
         <string>Show</string>
        </attribute>
-       <widget class="QCheckBox" name="parameterShowModelBtn">
+       <widget class="QCheckBox" name="parameterizationShowModelBtn">
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -414,7 +392,7 @@
          <string>Model</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="parameterShowParamBtn">
+       <widget class="QCheckBox" name="parameterizationShowParamBtn">
         <property name="geometry">
          <rect>
           <x>100</x>
@@ -445,7 +423,7 @@
        <attribute name="title">
         <string>Boundary</string>
        </attribute>
-       <widget class="QCheckBox" name="parameterBoundaryCircleBtn">
+       <widget class="QCheckBox" name="parameterizationBoundaryCircleBtn">
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -458,7 +436,7 @@
          <string>Circle</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="parameterBoundarySquareBtn">
+       <widget class="QCheckBox" name="parameterizationBoundarySquareBtn">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -489,7 +467,7 @@
        <attribute name="title">
         <string>Inner</string>
        </attribute>
-       <widget class="QCheckBox" name="parameterInnerAverageBtn">
+       <widget class="QCheckBox" name="parameterizationInnerAverageBtn">
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -502,7 +480,7 @@
          <string>Averarge</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="parameterInnerShapPreserveBtn">
+       <widget class="QCheckBox" name="parameterizationShapPreserveBtn">
         <property name="geometry">
          <rect>
           <x>100</x>
@@ -517,7 +495,7 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QPushButton" name="parameterMoelDelBtn">
+     <widget class="QPushButton" name="parameterizationMoelDelBtn">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -600,13 +578,6 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>RenderView</class>
-   <extends>QOpenGLWidget</extends>
-   <header>renderview.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="Pikachu.qrc"/>
  </resources>

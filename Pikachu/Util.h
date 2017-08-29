@@ -7,7 +7,7 @@
 namespace zcg {
 
 	static const float RenderViewWidth = 1000.0f;
-	static const float RenderViewHeight = 800.0f;
+	static const float RenderViewHeight = 900.0f;
 
 
 	typedef	int ZVALUE;

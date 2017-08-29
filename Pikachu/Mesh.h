@@ -30,7 +30,8 @@ public:
 
 	// ========== interactive with outer =================
 	bool buildMesh(QString fileName);
-	
+	void parameterizeMesh(ZVALUE boundaryType, ZVALUE innerType);
+
 	// ========= get value ===================
 	const int getVertexCount() const;
 	const int getFaceCount() const;
@@ -43,9 +44,6 @@ public:
 	const QVector<float>& getFaceNormal() const;
 	const QVector<bool>& getIsBoundary() const;
 	SparseMatrix<int>* const getAdjacentVV() const;
-
-	// ========= set value ===============
-	void setTextureCoordinate(const QVector<float> &textureCoord);
 
 private:
 	// ======== prase molde file to mesh ============
@@ -74,19 +72,22 @@ private:
 	QVector<float> m_vertexPos;
 	QVector<float> m_originalPos;
 	QVector<float> m_vertexNormal;
-	QVector<float> m_textureCoordinate;
 	QVector<uint> m_faceIndex;
 	QVector<float> m_faceNormal;
 	QVector<bool> m_isBoundary;
-
-	// ============ value for unit box ============
-	glm::vec3 m_maxCoord;
-	glm::vec3 m_minCoord;
+	QVector<float> m_textureCoordinate;
 
 	// ============ sparse matrix for vertex-vertex vertex-face face-face =============
 	SparseMatrix<int>* m_adjacentVV;
 	SparseMatrix<int>* m_adjacentVF;
 	SparseMatrix<int>* m_adjacentFF;
+
+	// ============ value for unit box ============
+	glm::vec3 m_maxCoord;
+	glm::vec3 m_minCoord;
+
+	// ===========  parameterization =============
+	Parameterization* m_parameterization;
 
 private:
 	template<typename T> void printQVector(QVector<T> &v, QString name);

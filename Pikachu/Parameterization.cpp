@@ -19,13 +19,12 @@ void Parameterization::calculate(ZVALUE boundaryType, ZVALUE innerType)
 	this->findBoundaryAndInnerVertices();
 	this->boundaryVerticesParameterize(boundaryType);
 	this->innerVerticesParameterize(innerType);
+	this->mergeBoundaryAndInnerParameterizedResult();
 }
 
 
-void Parameterization::dumpToObjeFile(QString fileName)
+void Parameterization::dumpToObjeFile(QString fileName) const
 {
-	this->mergeBoundaryAndInnerParameterizedResult(Z_3D);
-
 	QFile dumpFile(fileName);
 	if (!dumpFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
 	{
@@ -53,9 +52,8 @@ void Parameterization::dumpToObjeFile(QString fileName)
 }
 
 
-const QVector<float>& Parameterization::getParameterizedResult(ZVALUE dimensionType)
+const QVector<float>& Parameterization::getParameterizedResult() const
 {
-	this->mergeBoundaryAndInnerParameterizedResult(dimensionType);
 	return m_parameterizedResult;
 }
 
@@ -313,36 +311,27 @@ void Parameterization::innerVerticesParameterize(ZVALUE innerType)
 }
 
 
-void Parameterization::mergeBoundaryAndInnerParameterizedResult(ZVALUE dimensionType)
+void Parameterization::mergeBoundaryAndInnerParameterizedResult()
 {
-	assert(dimensionType == Z_2D || dimensionType == Z_3D);
 	int index, step;
 
-	step = dimensionType == Z_3D ? 3 : 2;
-
-	m_parameterizedResult.resize(m_vertexCount * step);
+	m_parameterizedResult.resize(m_vertexCount * 3);
 	m_parameterizedResult.squeeze();
 	
 	for (int i = 0; i < m_boundaryVertexIndices.count(); i++)
 	{
 		index = m_boundaryVertexIndices.at(i);
-		m_parameterizedResult[index * step] = m_boundaryVerticesResult[i * 3];
-		m_parameterizedResult[index * step + 1] = m_boundaryVerticesResult[i * 3 + 1];
-		if (dimensionType == Z_3D)
-		{
-			m_parameterizedResult[index * step + 2] = m_boundaryVerticesResult[i * 3 + 2];
-		}	
+		m_parameterizedResult[index * 3] = m_boundaryVerticesResult[i * 3];
+		m_parameterizedResult[index * 3 + 1] = m_boundaryVerticesResult[i * 3 + 1];
+		m_parameterizedResult[index * 3 + 2] = m_boundaryVerticesResult[i * 3 + 2];	
 	}
 
 	for (int i = 0; i < m_innerVertexIndices.count(); i++)
 	{
 		index = m_innerVertexIndices.at(i);
-		m_parameterizedResult[index * step] = m_innerVerticesResult[i * 3];
-		m_parameterizedResult[index * step + 1] = m_innerVerticesResult[i * 3 + 1];
-		if (dimensionType == Z_3D)
-		{
-			m_parameterizedResult[index * step + 2] = m_innerVerticesResult[i * 3 + 2];
-		}
+		m_parameterizedResult[index * 3] = m_innerVerticesResult[i * 3];
+		m_parameterizedResult[index * 3 + 1] = m_innerVerticesResult[i * 3 + 1];
+		m_parameterizedResult[index * 3 + 2] = m_innerVerticesResult[i * 3 + 2];
 	}
 }
 

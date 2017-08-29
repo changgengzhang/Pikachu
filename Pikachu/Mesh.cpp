@@ -12,6 +12,8 @@ Mesh::Mesh()
 	m_adjacentVV = nullptr;
 	m_adjacentVF = nullptr;
 	m_adjacentFF = nullptr;
+
+	m_parameterization = nullptr;
 }
 
 Mesh::~Mesh()
@@ -40,9 +42,7 @@ bool Mesh::buildMesh(QString fileName)
 	{
 		bool ret = this->parseMeshFromObjFile(fileName);
 		if (ret)
-		{
 			return true;
-		}
 		else
 		{
 			qDebug() << "ERROR::MESH::buildMesh::parseFromObjFile: Failed";
@@ -55,6 +55,23 @@ bool Mesh::buildMesh(QString fileName)
 		return false;
 	}
 	return false;
+}
+
+void Mesh::parameterizeMesh(ZVALUE boundaryType, ZVALUE innerType)
+{
+	if (m_parameterization != nullptr) delete m_parameterization;
+
+	m_parameterization = new Parameterization(m_vertexPos, m_faceIndex,	m_isBoundary, m_adjacentVV, m_boundaryVertexCount);
+	m_parameterization->calculate(boundaryType, innerType);
+
+	// set texture coordiante
+	QVector<float> parameterizedResult = m_parameterization->getParameterizedResult();
+	m_textureCoordinate.clear();
+	for (uint i = 0; i < m_vertexCount; i++)
+	{
+		m_textureCoordinate.append(parameterizedResult.at(i * 3));
+		m_textureCoordinate.append(parameterizedResult.at(i * 3 + 1));
+	}
 }
 
 
@@ -442,17 +459,6 @@ SparseMatrix<int>* const Mesh::getAdjacentVV() const
 	return m_adjacentVV;
 }
 
-
-// ========= set value ===============
-void Mesh::setTextureCoordinate(const QVector<float> &textureCoord)
-{
-	m_textureCoordinate.clear();
-	for (uint pos = 0; pos < m_vertexCount; pos++)
-	{
-		m_textureCoordinate.append(textureCoord.at(pos * 2));
-		m_textureCoordinate.append(textureCoord.at(pos * 2 + 1));
-	}
-}
 
 
 template<typename T> void  Mesh::printQVector(QVector<T> &v, QString name)

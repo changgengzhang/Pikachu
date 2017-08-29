@@ -19,7 +19,7 @@
 
 #include "SparseMatrix.h"
 #include "Util.h"
-#include "Mesh.h"
+
 using namespace zcg;
 
 class Parameterization : public QObject
@@ -33,17 +33,16 @@ public:
 
 	~Parameterization();
 	void calculate(ZVALUE boundaryType, ZVALUE innerType);
-	void dumpToObjeFile(QString fileName);
-	const QVector<float>& getParameterizedResult(ZVALUE dimensionType);
+	void dumpToObjeFile(QString fileName) const;
+	const QVector<float>& getParameterizedResult() const;
 
 private:
 	// ========== function =============
 	void findBoundaryAndInnerVertices();
 	void boundaryVerticesParameterize(ZVALUE boundaryType);
 	void innerVerticesParameterize(ZVALUE innerType);
-	void mergeBoundaryAndInnerParameterizedResult(ZVALUE dimensionType);
+	void mergeBoundaryAndInnerParameterizedResult();
 	
-
 	// ========= values ===============
 	int m_vertexCount;
 	int m_faceCount;

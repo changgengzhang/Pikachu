@@ -5,6 +5,7 @@
 #include <qfiledialog.h>
 
 #include "ui_Pikachu.h"
+#include "RenderView.h"
 
 class Pikachu : public QMainWindow
 {
@@ -16,6 +17,7 @@ public:
 
 private:
 	Ui::PikachuClass m_ui;
+	RenderView *m_renderView;
 
 	// =========== helper function ==========
 	void buildSlotsAndSignals();
