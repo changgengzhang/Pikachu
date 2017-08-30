@@ -5,10 +5,8 @@ Pikachu::Pikachu(QWidget *parent)
 {
 	m_ui.setupUi(this);
 
+	this->buildSlotsAndSignals();
 	this->initUi();
-	this->buildSlotsAndSignals();	
-
-	m_ui.modelPolygonFaceBtn->setChecked(true);
 }
 
 Pikachu::~Pikachu()
@@ -21,7 +19,7 @@ void Pikachu::buildSlotsAndSignals()
 {
 	// model
 	connect(m_ui.modelLoadBtn, SIGNAL(clicked()), this, SLOT(onModelLoadBtnClicked()));
-	connect(m_ui.modelDelBtn, SIGNAL(clicked()), m_renderView, SLOT(onModelDelBtnClicked()));
+	connect(m_ui.modelDelBtn, SIGNAL(clicked()), m_ui.renderView, SLOT(onModelDelBtnClicked()));
 	
 	// polygon type
 	connect(m_ui.modelPolygonFaceBtn, SIGNAL(stateChanged(int)), this, SLOT(onModelPolygonFaceBtnClicked(int)));
@@ -30,27 +28,27 @@ void Pikachu::buildSlotsAndSignals()
 
 	// texture
 	connect(m_ui.modelTextureSetBtn, SIGNAL(clicked()), this, SLOT(onModelTextureSetBtnClicked()));
-	connect(m_ui.modelTextureDelBtn, SIGNAL(clicked()), m_renderView, SLOT(onModelTextureDelBtnClicked()));
+	connect(m_ui.modelTextureDelBtn, SIGNAL(clicked()), m_ui.renderView, SLOT(onModelTextureDelBtnClicked()));
 
 	// parameterization inner type
-	connect(m_ui.modelTextureAverageBtn, SIGNAL(stateChanged(int)), this, SLOT(onModelTextureAverageBtnClicked(int)));
+	connect(m_ui.modelTextureuUniformBtn, SIGNAL(stateChanged(int)), this, SLOT(onModelTextureUniformBtnClicked(int)));
 	connect(m_ui.modelTextureShapPreserveBtn, SIGNAL(stateChanged(int)), this, SLOT(onModelTextureShapPreserveBtnClicked(int)));
 
 	// deliver data 
-	connect(this, SIGNAL(deliverPolygonType(ZVALUE)), m_renderView, SLOT(acceptPolygonType(ZVALUE)));
-	connect(this, SIGNAL(deliverString(FileType, QString)), m_renderView, SLOT(acceptString(FileType, QString)));
-	connect(this, SIGNAL(deliverParameterizationInnerType(ZVALUE)), m_renderView, SLOT(acceptParameterizationInnerType(ZVALUE)));
+	connect(this, SIGNAL(deliverPolygonType(ZVALUE)), m_ui.renderView, SLOT(acceptPolygonType(ZVALUE)));
+	connect(this, SIGNAL(deliverString(FileType, QString)), m_ui.renderView, SLOT(acceptString(FileType, QString)));
+	connect(this, SIGNAL(deliverParameterizationInnerType(ZVALUE)), m_ui.renderView, SLOT(acceptParameterizationInnerType(ZVALUE)));
+
+
+	// 
+	//connect(m_ui.renderTypeTab, SIGNAL(currentChanged(int)), m_ui.renderView, SLOT());
 }
 
 
 void Pikachu::initUi()
 {
-	m_renderView = new RenderView(m_ui.centralWidget);
-	m_renderView->setObjectName(QStringLiteral("renderView"));
-	m_renderView->setGeometry(QRect(10, 10, 1000, 900));
-	m_renderView->setMinimumSize(QSize(1000, 900));
-	m_renderView->setMaximumSize(QSize(1000, 900));
-	m_renderView->show();
+	m_ui.modelPolygonFaceBtn->setChecked(true);
+	
 }
 
 
@@ -120,12 +118,12 @@ void Pikachu::onModelTextureSetBtnClicked()
 	}
 }
 
-void Pikachu::onModelTextureAverageBtnClicked(int state)
+void Pikachu::onModelTextureUniformBtnClicked(int state)
 {
 	if (state == Qt::Checked)
 	{
 		m_ui.modelTextureShapPreserveBtn->setCheckState(Qt::Unchecked);
-		emit deliverParameterizationInnerType(Z_AVERAGE);
+		emit deliverParameterizationInnerType(Z_UNIFORM);
 	}
 	else
 	{
@@ -138,7 +136,7 @@ void Pikachu::onModelTextureShapPreserveBtnClicked(int state)
 {
 	if (state == Qt::Checked)
 	{
-		m_ui.modelTextureAverageBtn->setCheckState(Qt::Unchecked);
+		m_ui.modelTextureuUniformBtn->setCheckState(Qt::Unchecked);
 		emit deliverParameterizationInnerType(Z_SHAP_PRESERVING);
 	}
 	else

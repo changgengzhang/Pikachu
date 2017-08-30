@@ -17,7 +17,6 @@ public:
 
 private:
 	Ui::PikachuClass m_ui;
-	RenderView *m_renderView;
 
 	// =========== helper function ==========
 	void buildSlotsAndSignals();
@@ -40,7 +39,7 @@ private slots:
 	void onModelPolygonPointBtnClicked(int state);
 	
 	void onModelTextureSetBtnClicked();
-	void onModelTextureAverageBtnClicked(int state);
+	void onModelTextureUniformBtnClicked(int state);
 	void onModelTextureShapPreserveBtnClicked(int state);
 
 };

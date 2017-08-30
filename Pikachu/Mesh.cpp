@@ -69,9 +69,15 @@ void Mesh::parameterizeMesh(ZVALUE boundaryType, ZVALUE innerType)
 	m_textureCoordinate.clear();
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
-		m_textureCoordinate.append(parameterizedResult.at(i * 3));
-		m_textureCoordinate.append(parameterizedResult.at(i * 3 + 1));
+		m_textureCoordinate.append(parameterizedResult.at(i * 2));
+		m_textureCoordinate.append(parameterizedResult.at(i * 2 + 1));
 	}
+}
+
+
+void Mesh::dumpParameterizationToFile(QString fileName)
+{
+	m_parameterization->dumpToObjeFile(fileName);
 }
 
 

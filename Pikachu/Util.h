@@ -9,6 +9,7 @@ namespace zcg {
 	static const float RenderViewWidth = 1000.0f;
 	static const float RenderViewHeight = 900.0f;
 
+	static const float Z_EPSILON = 0.001;
 
 	typedef	int ZVALUE;
 	static const int Z_NONE = 0x0;
@@ -20,7 +21,7 @@ namespace zcg {
 	static const int Z_SQUARE = 0x4;
 	static const int Z_CIRCLE = 0x5;
 
-	static const int Z_AVERAGE = 0x6;
+	static const int Z_UNIFORM = 0x6;
 	static const int Z_SHAP_PRESERVING = 0x7;
 
 	static const int Z_1D = 0x8;

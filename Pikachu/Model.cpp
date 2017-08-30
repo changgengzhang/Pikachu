@@ -378,4 +378,15 @@ void  Model::attachTexture()
 	m_mesh->parameterizeMesh(Z_SQUARE, m_paramInnerType);
 	this->buildVAOAndVBO();
 	this->generateTexture(m_textureFileName);
+	
+	QString fileName;
+	if (m_paramInnerType == Z_UNIFORM)
+	{
+		fileName = "../Data/Model/" + m_modelFileName.split("/").last().split(".").first() + "_" + "uniform.obj";
+	}
+	else if (m_paramInnerType == Z_SHAP_PRESERVING)
+	{
+		fileName = "../Data/Model/" + m_modelFileName.split("/").last().split(".").first() + "_" + "shap_preserving.obj";
+	}
+	m_mesh->dumpParameterizationToFile(fileName);
 }

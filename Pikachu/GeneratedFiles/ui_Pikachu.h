@@ -21,6 +21,7 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QWidget>
+#include "renderview.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -28,6 +29,7 @@ class Ui_PikachuClass
 {
 public:
     QWidget *centralWidget;
+    RenderView *renderView;
     QTabWidget *tabWidget_4;
     QWidget *tab_5;
     QPushButton *bgSetBtn;
@@ -36,7 +38,7 @@ public:
     QWidget *tab_6;
     QCheckBox *bgSmoothBtn;
     QSlider *bgSmoothSlider;
-    QTabWidget *tabWidget;
+    QTabWidget *renderTypeTab;
     QWidget *modelTab;
     QTabWidget *tabWidget_2;
     QWidget *tab_2;
@@ -53,7 +55,7 @@ public:
     QWidget *tab_12;
     QPushButton *modelTextureDelBtn;
     QPushButton *modelTextureSetBtn;
-    QCheckBox *modelTextureAverageBtn;
+    QCheckBox *modelTextureuUniformBtn;
     QCheckBox *modelTextureShapPreserveBtn;
     QWidget *parameterizationTab;
     QPushButton *parameterizationMoelLoadBtn;
@@ -84,6 +86,11 @@ public:
         PikachuClass->setMaximumSize(QSize(1305, 920));
         centralWidget = new QWidget(PikachuClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
+        renderView = new RenderView(centralWidget);
+        renderView->setObjectName(QStringLiteral("renderView"));
+        renderView->setGeometry(QRect(10, 10, 1000, 900));
+        renderView->setMinimumSize(QSize(1000, 900));
+        renderView->setMaximumSize(QSize(1000, 900));
         tabWidget_4 = new QTabWidget(centralWidget);
         tabWidget_4->setObjectName(QStringLiteral("tabWidget_4"));
         tabWidget_4->setGeometry(QRect(1030, 10, 261, 171));
@@ -114,9 +121,9 @@ public:
         bgSmoothSlider->setOrientation(Qt::Horizontal);
         bgOperationTab->addTab(tab_6, QString());
         tabWidget_4->addTab(tab_5, QString());
-        tabWidget = new QTabWidget(centralWidget);
-        tabWidget->setObjectName(QStringLiteral("tabWidget"));
-        tabWidget->setGeometry(QRect(1030, 200, 261, 351));
+        renderTypeTab = new QTabWidget(centralWidget);
+        renderTypeTab->setObjectName(QStringLiteral("renderTypeTab"));
+        renderTypeTab->setGeometry(QRect(1030, 200, 261, 351));
         modelTab = new QWidget();
         modelTab->setObjectName(QStringLiteral("modelTab"));
         tabWidget_2 = new QTabWidget(modelTab);
@@ -164,14 +171,14 @@ public:
         modelTextureSetBtn = new QPushButton(tab_12);
         modelTextureSetBtn->setObjectName(QStringLiteral("modelTextureSetBtn"));
         modelTextureSetBtn->setGeometry(QRect(20, 10, 61, 21));
-        modelTextureAverageBtn = new QCheckBox(tab_12);
-        modelTextureAverageBtn->setObjectName(QStringLiteral("modelTextureAverageBtn"));
-        modelTextureAverageBtn->setGeometry(QRect(20, 40, 61, 31));
+        modelTextureuUniformBtn = new QCheckBox(tab_12);
+        modelTextureuUniformBtn->setObjectName(QStringLiteral("modelTextureuUniformBtn"));
+        modelTextureuUniformBtn->setGeometry(QRect(20, 40, 61, 31));
         modelTextureShapPreserveBtn = new QCheckBox(tab_12);
         modelTextureShapPreserveBtn->setObjectName(QStringLiteral("modelTextureShapPreserveBtn"));
         modelTextureShapPreserveBtn->setGeometry(QRect(20, 70, 101, 31));
         tabWidget_11->addTab(tab_12, QString());
-        tabWidget->addTab(modelTab, QString());
+        renderTypeTab->addTab(modelTab, QString());
         parameterizationTab = new QWidget();
         parameterizationTab->setObjectName(QStringLiteral("parameterizationTab"));
         parameterizationMoelLoadBtn = new QPushButton(parameterizationTab);
@@ -216,7 +223,7 @@ public:
         parameterizationMoelDelBtn = new QPushButton(parameterizationTab);
         parameterizationMoelDelBtn->setObjectName(QStringLiteral("parameterizationMoelDelBtn"));
         parameterizationMoelDelBtn->setGeometry(QRect(140, 10, 101, 31));
-        tabWidget->addTab(parameterizationTab, QString());
+        renderTypeTab->addTab(parameterizationTab, QString());
         sensitivityTab = new QTabWidget(centralWidget);
         sensitivityTab->setObjectName(QStringLiteral("sensitivityTab"));
         sensitivityTab->setGeometry(QRect(1030, 570, 261, 80));
@@ -244,7 +251,7 @@ public:
 
         tabWidget_4->setCurrentIndex(0);
         bgOperationTab->setCurrentIndex(0);
-        tabWidget->setCurrentIndex(0);
+        renderTypeTab->setCurrentIndex(0);
         tabWidget_2->setCurrentIndex(0);
         tabWidget_11->setCurrentIndex(0);
         tabWidget_8->setCurrentIndex(0);
@@ -276,10 +283,10 @@ public:
         modelDelBtn->setText(QApplication::translate("PikachuClass", "Del", Q_NULLPTR));
         modelTextureDelBtn->setText(QApplication::translate("PikachuClass", "Del", Q_NULLPTR));
         modelTextureSetBtn->setText(QApplication::translate("PikachuClass", "Set", Q_NULLPTR));
-        modelTextureAverageBtn->setText(QApplication::translate("PikachuClass", "Averarge", Q_NULLPTR));
+        modelTextureuUniformBtn->setText(QApplication::translate("PikachuClass", "Uniform", Q_NULLPTR));
         modelTextureShapPreserveBtn->setText(QApplication::translate("PikachuClass", "Shap Preserve", Q_NULLPTR));
         tabWidget_11->setTabText(tabWidget_11->indexOf(tab_12), QApplication::translate("PikachuClass", "Texture", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(modelTab), QApplication::translate("PikachuClass", "    Model    ", Q_NULLPTR));
+        renderTypeTab->setTabText(renderTypeTab->indexOf(modelTab), QApplication::translate("PikachuClass", "    Model    ", Q_NULLPTR));
         parameterizationMoelLoadBtn->setText(QApplication::translate("PikachuClass", "Load", Q_NULLPTR));
         parameterizationShowModelBtn->setText(QApplication::translate("PikachuClass", "Model", Q_NULLPTR));
         parameterizationShowParamBtn->setText(QApplication::translate("PikachuClass", "Parameterization", Q_NULLPTR));
@@ -291,7 +298,7 @@ public:
         parameterizationShapPreserveBtn->setText(QApplication::translate("PikachuClass", "Shap Preserve", Q_NULLPTR));
         tabWidget_10->setTabText(tabWidget_10->indexOf(tab_15), QApplication::translate("PikachuClass", "Inner", Q_NULLPTR));
         parameterizationMoelDelBtn->setText(QApplication::translate("PikachuClass", "Del", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(parameterizationTab), QApplication::translate("PikachuClass", "Parameterization", Q_NULLPTR));
+        renderTypeTab->setTabText(renderTypeTab->indexOf(parameterizationTab), QApplication::translate("PikachuClass", "Parameterization", Q_NULLPTR));
         sensitivityTab->setTabText(sensitivityTab->indexOf(tab), QApplication::translate("PikachuClass", "MouseSensitivity", Q_NULLPTR));
     } // retranslateUi
 

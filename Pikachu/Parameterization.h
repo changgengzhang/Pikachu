@@ -13,7 +13,7 @@
 // glm
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
-
+ 
 // =========== Eigen ===========
 #include <Eigen\Dense>
 
@@ -43,6 +43,8 @@ private:
 	void innerVerticesParameterize(ZVALUE innerType);
 	void mergeBoundaryAndInnerParameterizedResult();
 	
+	void ComputeShapPreservingWeight(int currIndex, QVector<float> &vertexWeight);
+
 	// ========= values ===============
 	int m_vertexCount;
 	int m_faceCount;

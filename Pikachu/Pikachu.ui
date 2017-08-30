@@ -26,6 +26,28 @@
    <string>Pikachu</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <widget class="RenderView" name="renderView">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>1000</width>
+      <height>900</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>1000</width>
+      <height>900</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>1000</width>
+      <height>900</height>
+     </size>
+    </property>
+   </widget>
    <widget class="QTabWidget" name="tabWidget_4">
     <property name="geometry">
      <rect>
@@ -129,7 +151,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QTabWidget" name="tabWidget">
+   <widget class="QTabWidget" name="renderTypeTab">
     <property name="geometry">
      <rect>
       <x>1030</x>
@@ -317,7 +339,7 @@
          <string>Set</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="modelTextureAverageBtn">
+       <widget class="QCheckBox" name="modelTextureuUniformBtn">
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -327,7 +349,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Averarge</string>
+         <string>Uniform</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="modelTextureShapPreserveBtn">
@@ -578,6 +600,13 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>RenderView</class>
+   <extends>QOpenGLWidget</extends>
+   <header>renderview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="Pikachu.qrc"/>
  </resources>

@@ -31,6 +31,7 @@ public:
 	// ========== interactive with outer =================
 	bool buildMesh(QString fileName);
 	void parameterizeMesh(ZVALUE boundaryType, ZVALUE innerType);
+	void dumpParameterizationToFile(QString fileName);
 
 	// ========= get value ===================
 	const int getVertexCount() const;

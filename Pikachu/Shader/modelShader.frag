@@ -19,6 +19,6 @@ void main()
 	}
 	else
 	{
-		fragColor = fsIn.position + 0.5;
+		fragColor = fsIn.position;
 	}
 } 
