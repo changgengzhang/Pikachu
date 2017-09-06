@@ -1,3 +1,27 @@
+/**
+*　　　　　　　　┏┓　　　┏┓+ +
+*　　　　　　　┏┛┻━━━┛┻┓ + +
+*　　　　　　　┃　　　　　　　┃ 　
+*　　　　　　　┃　　　━　　　┃ ++ + + +
+*　　　　　　 ████━████ ┃+
+*　　　　　　　┃　　　　　　　┃ +
+*　　　　　　　┃　　　┻　　　┃
+*　　　　　　　┃　　　　　　　┃ + +
+*　　　　　　　┗━┓　　　┏━┛
+*　　　　　　　　　┃　　　┃　　　　　　　　　　　
+*　　　　　　　　　┃　　　┃ + + + +
+*　　　　　　　　　┃　　　┃　　　　Code is far away from bug with the animal protecting　　　　　　　
+*　　　　　　　　　┃　　　┃ + 　　　　神兽保佑,代码无bug　　
+*　　　　　　　　　┃　　　┃
+*　　　　　　　　　┃　　　┃　　+　　　　　　　　　
+*　　　　　　　　　┃　 　　┗━━━┓ + +
+*　　　　　　　　　┃ 　　　　　　　┣┓
+*　　　　　　　　　┃ 　　　　　　　┏┛
+*　　　　　　　　　┗┓┓┏━┳┓┏┛ + + + +
+*　　　　　　　　　　┃┫┫　┃┫┫
+*　　　　　　　　　　┗┻┛　┗┻┛+ + + +
+*/
+
 #include "Pikachu.h"
 #include <QtWidgets/QApplication>
 #include <QtGlobal>
