@@ -98,7 +98,7 @@ void Model::draw()
 	glCullFace(GL_BACK);
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glEnable(GL_DEBUG_OUTPUT);
 
 	// model matrix manage by arcball. One model has one arcball
@@ -210,20 +210,21 @@ void Model::buildVAOAndVBO()
 	glEnableVertexAttribArray(0);
 	m_vbo.write(offset, m_mesh->getVertexPos().constData(), unitSize * 3);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	offset += unitSize * 3;
-
+	
 	// normal
+	offset += unitSize * 3;
 	glEnableVertexAttribArray(1);
 	m_vbo.write(offset, m_mesh->getVertexNormal().constData(), unitSize * 3);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(offset));
-	offset += unitSize * 3;
+	
 
 	// texture 
 	if (m_textureReady)
 	{
+		offset += unitSize * 3;
 		glEnableVertexAttribArray(2);
 		m_vbo.write(offset, m_mesh->getTextureCoordinate().constData(), unitSize * 2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(offset));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(offset));
 	}
 
 	m_vbo.release();
@@ -251,6 +252,7 @@ void Model::generateTexture(QString textureFile)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	m_texture = cv::imread(textureFile.toStdString());
+	cv::flip(m_texture, m_texture, 0);
 
 	if (m_texture.empty())
 		qErrnoWarning("ERROR::IMAGE::setup texture failed");

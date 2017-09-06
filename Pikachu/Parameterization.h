@@ -44,6 +44,7 @@ private:
 	void mergeBoundaryAndInnerParameterizedResult();
 	
 	void ComputeShapPreservingWeight(int currIndex, QVector<float> &vertexWeight);
+	bool sortNeighborVertex(QVector<int> &neighborVertexIndices, QVector<int> &localNeighborVertexIndices, int index);
 
 	// ========= values ===============
 	int m_vertexCount;

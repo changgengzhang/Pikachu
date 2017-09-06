@@ -67,10 +67,13 @@ void Mesh::parameterizeMesh(ZVALUE boundaryType, ZVALUE innerType)
 	// set texture coordiante
 	QVector<float> parameterizedResult = m_parameterization->getParameterizedResult();
 	m_textureCoordinate.clear();
+	float u, v;
 	for (uint i = 0; i < m_vertexCount; i++)
 	{
-		m_textureCoordinate.append(parameterizedResult.at(i * 2));
-		m_textureCoordinate.append(parameterizedResult.at(i * 2 + 1));
+		u = parameterizedResult.at(i * 2) + 0.5;
+		v = parameterizedResult.at(i * 2 + 1) + 0.5;
+		m_textureCoordinate.append(u);
+		m_textureCoordinate.append(v);
 	}
 }
 

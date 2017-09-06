@@ -20,7 +20,7 @@ void RenderView::initializeGL()
 	initializeOpenGLFunctions();
 
 	glViewport(0, 0, RenderViewWidth, RenderViewHeight);
-	glClearColor(1.0f, 1.0f, 1.0f, 1);
+	glClearColor(0.1f, 0.2f, 0.3f, 1);
 
 	m_modelMat = glm::mat4(1.0f);
 	m_viewMat = glm::lookAt(glm::vec3(0.0f, 0.0f, 1.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));

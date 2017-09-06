@@ -72,7 +72,7 @@ void Parameterization::findBoundaryAndInnerVertices()
 	{
 		if (m_isBoundary.at(pos))
 		{
-			boundaryVertices.append(pos);
+			boundaryVertices.push_back(pos);
 			currVertexIndex = pos;
 			findTag[pos] = true;
 			break;
@@ -95,7 +95,7 @@ void Parameterization::findBoundaryAndInnerVertices()
 				if (m_adjacentVV->get(vertexIndex, currVertexIndex) != 1)
 				{
 					currVertexIndex = vertexIndex;
-					boundaryVertices.append(currVertexIndex);
+					boundaryVertices.push_back(currVertexIndex);
 					findTag[currVertexIndex] = true;
 					break;
 				}
@@ -105,7 +105,7 @@ void Parameterization::findBoundaryAndInnerVertices()
 	
 	for (uint i = 0; i < boundaryVertices.count(); i++)
 	{
-		m_boundaryVertexIndices.append(boundaryVertices.at(i));
+		m_boundaryVertexIndices.push_back(boundaryVertices.at(i));
 	}
 
 	// ============== Innaer vertices ====================
@@ -113,7 +113,7 @@ void Parameterization::findBoundaryAndInnerVertices()
 	{
 		if (!m_boundaryVertexIndices.contains(index))
 		{
-			m_innerVertexIndices.append(index);
+			m_innerVertexIndices.push_back(index);
 		}
 	}
 }
@@ -142,7 +142,7 @@ void Parameterization::boundaryVerticesParameterize(ZVALUE boundaryType)
 		distance = qSqrt(distance);
 		m_boundaryLength += distance;
 
-		weight.append(m_boundaryLength);
+		weight.push_back(m_boundaryLength);
 	}
 
 	for (int pos = 0; pos < m_boundaryVertexCount; pos++)
@@ -158,25 +158,40 @@ void Parameterization::boundaryVerticesParameterize(ZVALUE boundaryType)
 		float edgeLenth = 1.0f;
 		for (uint i = 0; i < m_boundaryVertexCount; i++)
 		{
-			if (weight[i] <= 0.25)
+			if (weight[i] < 0.25 && weight[(i + 1) % m_boundaryVertexCount] > 0.25)
 			{
-				m_boundaryVerticesResult.append(weight.at(i) * 4 * edgeLenth - edgeLenth / 2.0f);
-				m_boundaryVerticesResult.append(-edgeLenth / 2.0f);
+				m_boundaryVerticesResult.push_back(0.25 * 4 * edgeLenth - edgeLenth / 2.0f);
+				m_boundaryVerticesResult.push_back(-edgeLenth / 2.0f);
+			}
+			else if (weight[i] <= 0.25)
+			{
+				m_boundaryVerticesResult.push_back(weight.at(i) * 4 * edgeLenth - edgeLenth / 2.0f);
+				m_boundaryVerticesResult.push_back(-edgeLenth / 2.0f);
+			}
+			else if (weight[i] < 0.5 && weight[(i + 1) % m_boundaryVertexCount] > 0.5)
+			{
+				m_boundaryVerticesResult.push_back(edgeLenth / 2.0f);
+				m_boundaryVerticesResult.push_back((0.5 - 0.25) * 4 * edgeLenth - edgeLenth / 2.0f);
 			}
 			else if (weight[i] <= 0.50)
 			{
-				m_boundaryVerticesResult.append(edgeLenth / 2.0f);
-				m_boundaryVerticesResult.append((weight.at(i) - 0.25) * 4 * edgeLenth - edgeLenth / 2.0f);
+				m_boundaryVerticesResult.push_back(edgeLenth / 2.0f);
+				m_boundaryVerticesResult.push_back((weight.at(i) - 0.25) * 4 * edgeLenth - edgeLenth / 2.0f);
+			}
+			else if (weight[i] < 0.75 && weight[(i + 1) % m_boundaryVertexCount] > 0.75)
+			{
+				m_boundaryVerticesResult.push_back(edgeLenth / 2.0f - (0.75 - 0.5) * 4 * edgeLenth);
+				m_boundaryVerticesResult.push_back(edgeLenth / 2.0f);
 			}
 			else if (weight[i] <= 0.75)
 			{
-				m_boundaryVerticesResult.append(edgeLenth / 2.0f - (weight.at(i) - 0.5) * 4 * edgeLenth);
-				m_boundaryVerticesResult.append(edgeLenth / 2.0f);
+				m_boundaryVerticesResult.push_back(edgeLenth / 2.0f - (weight.at(i) - 0.5) * 4 * edgeLenth);
+				m_boundaryVerticesResult.push_back(edgeLenth / 2.0f);
 			}
 			else if (weight[i] <= 1.0)
 			{
-				m_boundaryVerticesResult.append(-edgeLenth / 2.0f);
-				m_boundaryVerticesResult.append(edgeLenth / 2.0f - (weight.at(i) - 0.75) * 4 * edgeLenth);
+				m_boundaryVerticesResult.push_back(-edgeLenth / 2.0f);
+				m_boundaryVerticesResult.push_back(edgeLenth / 2.0f - (weight.at(i) - 0.75) * 4 * edgeLenth);
 			}
 		}
 		break;
@@ -187,8 +202,8 @@ void Parameterization::boundaryVerticesParameterize(ZVALUE boundaryType)
 		float circle = 2 * M_PI;
 		for (uint i = 0; i < m_boundaryVertexCount; i++)
 		{
-			m_boundaryVerticesResult.append(radius * qCos(weight[i] / m_boundaryLength));
-			m_boundaryVerticesResult.append(radius * qSin(weight[i] / m_boundaryLength));
+			m_boundaryVerticesResult.push_back(radius * qCos(weight[i] / m_boundaryLength));
+			m_boundaryVerticesResult.push_back(radius * qSin(weight[i] / m_boundaryLength));
 		}
 		break;
 	}
@@ -196,28 +211,6 @@ void Parameterization::boundaryVerticesParameterize(ZVALUE boundaryType)
 		break;
 	}
 
-	//QFile dumpFile("./boundary.txt");
-
-	//if (!dumpFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
-	//{
-	//	return;
-	//}
-
-	//QTextStream dumpStream(&dumpFile);
-
-	//for (uint i = 0; i < m_boundaryVerticesResult.count(); i++)
-	//{
-	//	dumpStream.setRealNumberPrecision(10);
-
-	//	if (i % 2 == 0)
-	//	{
-	//		dumpStream << m_boundaryVerticesResult.at(i) << ",";
-	//	}
-	//	else
-	//	{
-	//		dumpStream << m_boundaryVerticesResult.at(i) << "\n";
-	//	}
-	//}
 }
 
 
@@ -256,7 +249,7 @@ void Parameterization::innerVerticesParameterize(ZVALUE innerType)
 		{
 			for (int w = 0; w < neighborCount; w++)
 			{
-				vertexWeight.append(1.0f / neighborCount);
+				vertexWeight.push_back(1.0f / neighborCount);
 			}
 			break;
 		}
@@ -308,8 +301,8 @@ void Parameterization::innerVerticesParameterize(ZVALUE innerType)
 
 	for (int i = 0; i < u.rows(); i++)
 	{
-		m_innerVerticesResult.append(u(i, 0));
-		m_innerVerticesResult.append(u(i, 1));
+		m_innerVerticesResult.push_back(u(i, 0));
+		m_innerVerticesResult.push_back(u(i, 1));
 	}
 }
 
@@ -320,7 +313,6 @@ void Parameterization::mergeBoundaryAndInnerParameterizedResult()
 	int index, step;
 
 	m_parameterizedResult.resize(m_vertexCount * 2);
-	m_parameterizedResult.squeeze();
 	
 	for (int i = 0; i < m_boundaryVertexIndices.count(); i++)
 	{
@@ -338,60 +330,96 @@ void Parameterization::mergeBoundaryAndInnerParameterizedResult()
 }
 
 
-void Parameterization::ComputeShapPreservingWeight(int currIndex, QVector<float> &vertexWeight)
+void Parameterization::ComputeShapPreservingWeight(int index, QVector<float> &vertexWeight)
 {
-	int neighborCount = m_adjacentVV->getOneRowElemNum(currIndex);
-	QVector<int> neighborVertexIndices = m_adjacentVV->getOneRowColIndex(currIndex);
 
+	int neighborCount = m_adjacentVV->getOneRowElemNum(index);
+	// 传入的weight vector的大小一定要符合要求
 	assert(vertexWeight.count() == neighborCount);
-	for (int i = 0; i < neighborCount; i++)
-	{
-		vertexWeight[i] = 0;
-	}
+	
+	QVector<int> neighborVertexIndices = m_adjacentVV->getOneRowColIndex(index);
+ 
+	/*
+		将p点的邻接点排序，因为找包围点的三角形的顶点p1p2p3时，p2p3一定是相邻的，如果不排序，这一点得不到保证
+		这里需要深度优先遍历将邻接点排序， 因为可能出现下面这种情况。
+		正确情况是p0 --> p1  --> p2。
+		但可能会出现 p0 --> p2，漏掉p1的情况。
 
+						   *p2							
+						*   *
+					 *	  *	*
+				  *		*	*
+			   *	  *		*
+		  p	*  *  * p1		*
+			   *	  *		*
+				  *		*	*
+				     *	  *	*	
+						*	*						
+						   *p0
+	*/
+	QVector<int> localNeighborVertexIndices;
+	{
+		int currIndex = neighborVertexIndices.at(0);
+		localNeighborVertexIndices.push_back(currIndex);
+		this->sortNeighborVertex(neighborVertexIndices, localNeighborVertexIndices, currIndex);
+	}
+	
 	// 局部参数化
 	// 计算每个点的角度和长度，
 	QVector<float> neighborAngle;
-	QVector<float> neighborLength;
+	QVector<float> neighborRadius;
 	float sumAngles = 0;
 	glm::vec3 p, pa, pb;
-	p.x = m_vertexPos.at(currIndex * 3 + 0);
-	p.y = m_vertexPos.at(currIndex * 3 + 1);
-	p.z = m_vertexPos.at(currIndex * 3 + 2);
+	p.x = m_vertexPos.at(index * 3 + 0);
+	p.y = m_vertexPos.at(index * 3 + 1);
+	p.z = m_vertexPos.at(index * 3 + 2);
 	for (int i = 0 ; i < neighborCount; i++)
 	{
-		int paIndex = neighborVertexIndices.at(i % neighborCount);
-		int pbIndex = neighborVertexIndices.at((i + 1) % neighborCount);
-		pa.x = m_vertexPos.at(paIndex * 3 + 0);
-		pa.y = m_vertexPos.at(paIndex * 3 + 1);
-		pa.z = m_vertexPos.at(paIndex * 3 + 2);
+		int paIndex = localNeighborVertexIndices.at(i % neighborCount);
+		int pbIndex = localNeighborVertexIndices.at((i + 1) % neighborCount);
+		pa.x = m_vertexPos.at(paIndex * 3 + 0) - p.x;
+		pa.y = m_vertexPos.at(paIndex * 3 + 1) - p.y;
+		pa.z = m_vertexPos.at(paIndex * 3 + 2) - p.z;
 
-		pb.x = m_vertexPos.at(pbIndex * 3 + 0);
-		pb.y = m_vertexPos.at(pbIndex * 3 + 1);
-		pb.z = m_vertexPos.at(pbIndex * 3 + 2);
+		pb.x = m_vertexPos.at(pbIndex * 3 + 0) - p.x;
+		pb.y = m_vertexPos.at(pbIndex * 3 + 1) - p.y;
+		pb.z = m_vertexPos.at(pbIndex * 3 + 2) - p.z;
 
-		float angle = qAcos(glm::dot(pa - p, pb - p) / (glm::length(pa - p) * glm::length(pb - p)));
+		float angle = qAcos(glm::dot(pa, pb) / (glm::length(pa) * glm::length(pb)));
 
 		sumAngles += angle;
-		neighborAngle.append(sumAngles);
-		neighborLength.append(glm::length(pa - p));
+		neighborAngle.push_back(sumAngles);
+		neighborRadius.push_back(glm::length(pa));
 	}
+
 	// 计算每条边与X轴的夹角，为了后面转换成极坐标的值
 	for (int i = 0; i < neighborCount; i++)
 	{
 		neighborAngle[i] = 2 * M_PI * neighborAngle[i] / sumAngles;
 	}
+
 	// 计算局部参数化坐标
+	// 这里将坐标扩大10倍
 	QVector<float> localParameterizedResult;
 	for (int i = 0; i < neighborCount; i++)
 	{
-		localParameterizedResult.append(neighborLength.at(i) * qCos(neighborAngle.at(i)));
-		localParameterizedResult.append(neighborLength.at(i) * qSin(neighborAngle.at(i)));
+		float x = 10 * neighborRadius.at(i) * qCos(neighborAngle.at(i));
+		float y = 10 * neighborRadius.at(i) * qSin(neighborAngle.at(i));
+		localParameterizedResult.push_back(x);
+		localParameterizedResult.push_back(y);
 	}
-
+	
 	// 可以假设 p = 0
 	int indexV1, indexV2, indexV3;
 	glm::vec2 v1, v2, v3, vp;
+	QVector<float> localWeight;
+
+	localWeight.resize(neighborCount);
+	for (int i = 0; i < neighborCount; i++)
+	{
+		localWeight[i] = 0.0f;
+	}
+
 	vp = glm::vec2(0.0f);
 	for (int i = 0; i < neighborCount; i++)
 	{
@@ -400,10 +428,10 @@ void Parameterization::ComputeShapPreservingWeight(int currIndex, QVector<float>
 
 		for (int j = 0; j < neighborCount; j++)
 		{
-			if (j == i || j + 1 == i) continue;
-
 			indexV2 = j % neighborCount;
 			indexV3 = (j + 1) % neighborCount;
+
+			if (indexV2 == indexV1 || indexV3 == indexV1) continue;
 
 			v2 = glm::vec2(localParameterizedResult[indexV2 * 2], localParameterizedResult[indexV2 * 2 + 1]);
 			v3 = glm::vec2(localParameterizedResult[indexV3 * 2], localParameterizedResult[indexV3 * 2 + 1]);
@@ -424,17 +452,53 @@ void Parameterization::ComputeShapPreservingWeight(int currIndex, QVector<float>
 			// p 点可能在三角形 V1V2V3 之外
 			if (qAbs(areaV1V2V3 - (areaPV2V3 + areaV1PV3 + areaV1V2P)) > Z_EPSILON) continue;
 			
-			vertexWeight[indexV1] += areaPV2V3 / areaV1V2V3;
-			vertexWeight[indexV2] += areaV1PV3 / areaV1V2V3;
-			vertexWeight[indexV3] += areaV1V2P / areaV1V2V3;
+			localWeight[indexV1] += areaPV2V3 / areaV1V2V3;
+			localWeight[indexV2] += areaV1PV3 / areaV1V2V3;
+			localWeight[indexV3] += areaV1V2P / areaV1V2V3;
 			
 			break;
 		}
 	}
 
-	// 均值
+	// 得到的是排序之后的，现在要恢复原来的顺序
 	for (int i = 0; i < neighborCount; i++)
 	{
-		vertexWeight[i] /= neighborCount;
+		int currIndex = localNeighborVertexIndices.at(i);
+		int pos = neighborVertexIndices.indexOf(currIndex);
+		
+		assert(pos != -1);
+
+		vertexWeight[pos] = localWeight.at(i) / neighborCount;
 	}
 }
+
+
+bool Parameterization::sortNeighborVertex(QVector<int> &neighborVertexIndices, QVector<int> &localNeighborVertexIndices, int index)
+{
+	// 递归出口
+	if (localNeighborVertexIndices.count() == neighborVertexIndices.count())
+	{
+		return true;
+	}
+
+	QVector<int> neighborIndex = m_adjacentVV->getOneRowColIndex(index);
+	for (int j = 0; j < neighborIndex.count(); j++)
+	{
+		int index = neighborIndex.at(j);
+		if (neighborVertexIndices.contains(index) && !localNeighborVertexIndices.contains(index))
+		{
+			localNeighborVertexIndices.push_back(index);
+			if (this->sortNeighborVertex(neighborVertexIndices, localNeighborVertexIndices, index))
+			{
+				return true;
+			}
+			else
+			{
+				localNeighborVertexIndices.pop_back();
+			}
+		}
+	}
+
+	return false;
+}
+
